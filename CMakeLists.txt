@@ -13,4 +13,6 @@ add_executable(untitled2 main.cpp
         matrix/field_info.h
         matrix/field_info.c
         matrix/matrix.c
+        matrix/tests.h
+        matrix/tests.c
 )

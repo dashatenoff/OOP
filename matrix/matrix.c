@@ -175,8 +175,12 @@ Matrix* AddLinearCombination(Matrix* a, int row, void* alphas){
 }
 
 void MatrixPrint(Matrix* m){
-    for (int i = 0; i < m->rows; i++){
-        for (int j = 0; j < m->cols; j++){
-            void*
+    for (int i = 0; i < m->rows; i++) {
+        for (int j = 0; j < m->cols; j++) {
+            void *el = MatrixGet(m, i, j);
+            m->type->print(el);
+            printf(" ");
         }
+        printf("\n")
+    }
 }

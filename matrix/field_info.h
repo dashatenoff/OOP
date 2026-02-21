@@ -14,6 +14,6 @@ typedef struct {
     void (*print)(void*);
 } FieldInfo;
 
-FieldInfo* GerIntFieldInfo();
+FieldInfo* GetIntFieldInfo();
 FieldInfo* GetDoubleFieldInfo();
 #endif //UNTITLED2_FIELD_INFO_H
