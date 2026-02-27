@@ -8,6 +8,8 @@ CMake Deprecation Warning:
   use the cmake-file-api(7) to view CMake-generated project build trees.
 
 
--- Configuring done (0.3s)
--- Generating done (0.0s)
--- Build files have been written to: C:/Users/dasha/CLionProjects/OOP/cmake-build-debug
+CMake Error at matrix/CMakeLists.txt:4 (add_subdirectory):
+  add_subdirectory given source "matrix" which is not an existing directory.
+
+
+-- Configuring incomplete, errors occurred!

@@ -8,8 +8,8 @@
 #include <stddef.h>
 
 typedef struct {
-    size_t size; //тип для размеров
-    void (*add)(void*, void*, void*); //функция сложения
+    size_t size;
+    void (*add)(void*, void*, void*);
     void (*mul)(void*, void*, void*);
     void (*print)(void*);
 } FieldInfo;

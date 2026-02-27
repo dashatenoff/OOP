@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
+
 Matrix* MatrixCreate(int rows, int cols, FieldInfo* type){
     Matrix* matrix = (Matrix*)malloc(sizeof(Matrix));
 
@@ -10,6 +11,8 @@ Matrix* MatrixCreate(int rows, int cols, FieldInfo* type){
         printf("Memory allocation error\n");
         return NULL;
     }
+    if (rows <= 0 || cols <= 0)
+        return NULL;
 
     matrix->rows = rows;
     matrix->cols = cols;
@@ -86,34 +89,33 @@ Matrix* MatrixMultiply(Matrix* a, Matrix* b){
 
     if (result == NULL)
         return NULL;
-
+    void* sum = malloc(a->type->size);
+    if (sum == NULL) {
+        MatrixFree(result);
+        return NULL;
+    }
+    void* mul = malloc(a->type->size);
+    if (mul == NULL) {
+        free(sum);
+        MatrixFree(result);
+        return NULL;
+    }
     for (int i=0; i<a->rows; i++){
         for (int j=0; j<b->cols; j++){
-            void* sum = malloc(a->type->size);
-            if (sum == NULL) {
-                MatrixFree(result);
-                return NULL;
-            }
             memset(sum, 0, a->type->size);
             for (int k=0; k<a->cols; k++){
                 void* a_el = MatrixGet(a, i, k);
                 void* b_el = MatrixGet(b, k, j);
-                void* mul = malloc(a->type->size);
-                if (mul == NULL) {
-                    free(sum);
-                    MatrixFree(result);
-                    return NULL;
-                }
 
                 a->type->mul(a_el, b_el, mul);
                 a->type->add(sum, mul, sum);
-                free(mul);
             }
             MatrixSet(result, i, j, sum);
-            free(sum);
+
         }
     }
-
+    free(sum);
+    free(mul);
     return result;
 }
 
@@ -150,7 +152,11 @@ Matrix* AddLinearCombination(Matrix* a, int row, void* alphas){
             MatrixSet(result, i, j, value);
         }
     }
-
+    void *mul = malloc(a->type->size);
+    if (mul == NULL) {
+        MatrixFree(result);
+        return NULL;
+    }
     for ( int i=0; i<a->rows; i++) {
         if (i == row)
             continue;
@@ -161,26 +167,25 @@ Matrix* AddLinearCombination(Matrix* a, int row, void* alphas){
             void *a_el = MatrixGet(a, i, j);
             void *r_el = MatrixGet(result, row, j);
 
-            void *mul = malloc(a->type->size);
-            if (mul == NULL) {
-                MatrixFree(result);
-                return NULL;
-            }
             a->type->mul(beta, a_el, mul);
             a->type->add(mul, r_el, r_el);
-            free(mul);
         }
     }
+    free(mul);
     return result;
 }
 
 void MatrixPrint(Matrix* m){
+    if (m == NULL) {
+        printf("Matrix is NULL\n");
+        return;
+    }
     for (int i = 0; i < m->rows; i++) {
         for (int j = 0; j < m->cols; j++) {
             void *el = MatrixGet(m, i, j);
             m->type->print(el);
             printf(" ");
         }
-        printf("\n")
+        printf("\n");
     }
 }
