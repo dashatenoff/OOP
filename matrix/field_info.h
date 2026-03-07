@@ -1,6 +1,3 @@
-//
-// Created by dasha on 18.02.2026.
-//
 
 #ifndef UNTITLED2_FIELD_INFO_H
 #define UNTITLED2_FIELD_INFO_H

@@ -5,14 +5,16 @@
 
 
 Matrix* MatrixCreate(int rows, int cols, FieldInfo* type){
+    if (rows <= 0 || cols <= 0)
+        return NULL;
+
     Matrix* matrix = (Matrix*)malloc(sizeof(Matrix));
 
     if (matrix == NULL){
         printf("Memory allocation error\n");
         return NULL;
     }
-    if (rows <= 0 || cols <= 0)
-        return NULL;
+
 
     matrix->rows = rows;
     matrix->cols = cols;
@@ -135,56 +137,77 @@ Matrix* MatrixTranspose(Matrix* a){
     return result;
 }
 
-Matrix* AddLinearCombination(Matrix* a, int row, void* alphas){
-    if (a == NULL){
+Matrix* AddLinearCombination(Matrix* a, int row, void* alphas)
+{
+    if (a == NULL || alphas == NULL)
         return NULL;
-    }
-    if (alphas == NULL)
-        return NULL;
-    Matrix* result = MatrixCreate(a->rows, a->cols, a->type);
 
+    if (row < 0 || row >= a->rows)
+        return NULL;
+
+    Matrix* result = MatrixCreate(a->rows, a->cols, a->type);
     if (result == NULL)
         return NULL;
 
-    for (int i=0; i<a->rows; i++){
-        for (int j=0; j<a->cols; j++){
-            void* value = MatrixGet(a, i,j);
+
+    for (int i = 0; i < a->rows; i++)
+        for (int j = 0; j < a->cols; j++)
+        {
+            void* value = MatrixGet(a, i, j);
             MatrixSet(result, i, j, value);
         }
-    }
-    void *mul = malloc(a->type->size);
-    if (mul == NULL) {
+
+    void* mul = malloc(a->type->size);
+    if (mul == NULL)
+    {
         MatrixFree(result);
         return NULL;
     }
-    for ( int i=0; i<a->rows; i++) {
+
+    for (int i = 0; i < a->rows; i++)
+    {
         if (i == row)
             continue;
 
-        void *beta = (char *) alphas + i * a->type->size;
+        void* beta = (char*)alphas + i * a->type->size;
 
-        for (int j = 0; j < a->cols; j++) {
-            void *a_el = MatrixGet(a, i, j);
-            void *r_el = MatrixGet(result, row, j);
+        for (int j = 0; j < a->cols; j++)
+        {
+            void* a_el = MatrixGet(a, i, j);
+            void* r_el = MatrixGet(result, row, j);
 
             a->type->mul(beta, a_el, mul);
             a->type->add(mul, r_el, r_el);
         }
     }
+
     free(mul);
     return result;
 }
 
-void MatrixPrint(Matrix* m){
-    if (m == NULL) {
+void MatrixPrint(Matrix* m)
+{
+    if (m == NULL)
+    {
         printf("Matrix is NULL\n");
         return;
     }
-    for (int i = 0; i < m->rows; i++) {
-        for (int j = 0; j < m->cols; j++) {
-            void *el = MatrixGet(m, i, j);
-            m->type->print(el);
-            printf(" ");
+
+    for (int i = 0; i < m->rows; i++)
+    {
+        for (int j = 0; j < m->cols; j++)
+        {
+            void* element = MatrixGet(m, i, j);
+
+            if (element == NULL)
+            {
+                printf("NULL ");
+            }
+            else
+            {
+                m->type->print(element);
+                printf(" ");
+            }
         }
         printf("\n");
     }

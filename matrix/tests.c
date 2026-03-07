@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <math.h>
 #include "matrix.h"
 #include "field_info.h"
 #include "tests.h"
@@ -189,50 +190,145 @@ void TestErrors()
     MatrixFree(A);
     MatrixFree(B);
 }
-
-/* =====================================
-   TestPerformance
-   ===================================== */
-void TestPerformance()
+int MatrixEquals(Matrix* A, Matrix* B, double eps)
 {
-    printf("\n========== TestPerformance ==========\n");
+    if (!A || !B) return 0;
+    if (A->rows != B->rows || A->cols != B->cols) return 0;
+
+    double va, vb;
+
+    for (int i = 0; i < A->rows; i++)
+        for (int j = 0; j < A->cols; j++)
+        {
+            MatrixGet(A, i, j);
+            MatrixGet(B, i, j);
+
+            if (fabs(va - vb) > eps)
+                return 0;
+        }
+
+    return 1;
+}
+void TestLargeMatrix()
+{
+    printf("\n========== TestLargeMatrix ==========\n");
 
     FieldInfo* type = GetDoubleFieldInfo();
 
+    int n = 5;   // сначала маленький для проверки
+    Matrix* A = MatrixCreate(n, n, type);
+
+    if (!A) {
+        printf("Memory error\n");
+        return;
+    }
+
+    double one = 1.0;
+
+    // Заполняем единицами
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            MatrixSet(A, i, j, &one);
+
+    printf("Matrix A (all ones):\n");
+    MatrixPrint(A);
+
+    /* ====== ADD ====== */
+    Matrix* S = MatrixAdd(A, A);
+
+    // Эталон
+    Matrix* S_true = MatrixCreate(n, n, type);
+    double two = 2.0;
+
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            MatrixSet(S_true, i, j, &two);
+
+    printf("\nTest: A + A (expected all 2)\n");
+
+    if (MatrixEquals(S, S_true, 1e-9))
+        printf("ADD: OK\n");
+    else {
+        printf("ADD: ERROR\n");
+        printf("Program result:\n");
+        MatrixPrint(S);
+        printf("Correct result:\n");
+        MatrixPrint(S_true);
+    }
+
+    /* ====== MULTIPLY ====== */
+    Matrix* M = MatrixMultiply(A, A);
+
+    Matrix* M_true = MatrixCreate(n, n, type);
+    double val = (double)n;
+
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            MatrixSet(M_true, i, j, &val);
+
+    printf("\nTest: A * A (expected all %d)\n", n);
+
+    if (MatrixEquals(M, M_true, 1e-9))
+        printf("MULTIPLY: OK\n");
+    else {
+        printf("MULTIPLY: ERROR\n");
+        printf("Program result:\n");
+        MatrixPrint(M);
+        printf("Correct result:\n");
+        MatrixPrint(M_true);
+    }
+
+    /* ====== TRANSPOSE ====== */
+    Matrix* T = MatrixTranspose(A);
+
+    printf("\nTest: Transpose of ones matrix (should be same)\n");
+
+    if (MatrixEquals(T, A, 1e-9))
+        printf("TRANSPOSE: OK\n");
+    else
+        printf("TRANSPOSE: ERROR\n");
+
+    MatrixFree(A);
+    MatrixFree(S);
+    MatrixFree(S_true);
+    MatrixFree(M);
+    MatrixFree(M_true);
+    MatrixFree(T);
+}
+/* =====================================
+   TestPerformance
+   ===================================== */
+void TestPerformanceLarge()
+{
+    printf("\n========== TestPerformanceLarge ==========\n");
+
+    FieldInfo* type = GetDoubleFieldInfo();
     int n = 300;
-    printf("Creating %dx%d matrices...\n", n, n);
 
     Matrix* A = MatrixCreate(n, n, type);
     Matrix* B = MatrixCreate(n, n, type);
 
-    if (!A || !B) {
-        printf("Memory allocation failed\n");
-        return;
-    }
-
-    double v = 1.0;
+    double one = 1.0;
 
     for (int i = 0; i < n; i++)
         for (int j = 0; j < n; j++)
         {
-            MatrixSet(A, i, j, &v);
-            MatrixSet(B, i, j, &v);
+            MatrixSet(A, i, j, &one);
+            MatrixSet(B, i, j, &one);
         }
-
-    printf("Multiplying...\n");
 
     clock_t start = clock();
     Matrix* C = MatrixMultiply(A, B);
     clock_t end = clock();
 
-    printf("Time for %dx%d multiplication: %.6f sec\n",
+    printf("Time for %dx%d multiply: %.3f sec\n",
            n, n, GetTime(start, end));
+
 
     MatrixFree(A);
     MatrixFree(B);
     MatrixFree(C);
 }
-
 /* =====================================
    RunAllTests
    ===================================== */
@@ -245,7 +341,8 @@ void RunAllTests()
     TestIntAll();
     TestDoubleRectangular();
     TestErrors();
-    TestPerformance();
+    TestLargeMatrix();
+    TestPerformanceLarge();
 
     printf("\n====================================\n");
     printf("ALL TESTS FINISHED\n");

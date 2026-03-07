@@ -63,7 +63,7 @@ int main()
         printf("Command: ");
         scanf("%d", &cmd);
 
-        if (cmd == 1) // Add
+        if (cmd == 1)
         {
 
 
