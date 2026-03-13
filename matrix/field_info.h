@@ -6,11 +6,11 @@
 
 typedef struct {
     size_t size;
-    void (*add)(void*, void*, void*);
-    void (*mul)(void*, void*, void*);
-    void (*print)(void*);
+    void (*add)(const void* a, const void* b, void* result);
+    void (*mul)(const void* a, const void* b, void* result);
+    void (*print)(const void* a);
 } FieldInfo;
 
-FieldInfo* GetIntFieldInfo();
-FieldInfo* GetDoubleFieldInfo();
+const FieldInfo* GetIntFieldInfo();
+const FieldInfo* GetDoubleFieldInfo();
 #endif //UNTITLED2_FIELD_INFO_H

@@ -1,7 +1,3 @@
-//
-// Created by dasha on 18.02.2026.
-//
-
 #ifndef UNTITLED2_MATRIX_H
 #define UNTITLED2_MATRIX_H
 
@@ -11,20 +7,20 @@ typedef struct {
     void* data;
     int rows;
     int cols;
-    FieldInfo* type;
+    const FieldInfo* type;
 } Matrix;
 
-Matrix* MatrixCreate(int rows, int cols, FieldInfo* type);
+Matrix* MatrixCreate(int rows, int cols, const FieldInfo* type);
 void MatrixFree(Matrix* matrix);
 
-void* MatrixGet(Matrix* matrix, int row, int col);
-void MatrixSet(Matrix* matrix, int row, int col, void* value);
+void* MatrixGet(const Matrix* matrix, int row, int col);
+void MatrixSet(Matrix* matrix, int row, int col, const void* value);
 
-Matrix* MatrixAdd(Matrix* a, Matrix* b);
-Matrix* MatrixMultiply(Matrix* a, Matrix* b);
-Matrix* MatrixTranspose(Matrix* a);
-Matrix* AddLinearCombination(Matrix* a, int row, void* alphas);
+Matrix* MatrixAdd(const Matrix* a, const Matrix* b);
+Matrix* MatrixMultiply(const Matrix* a, const Matrix* b);
+Matrix* MatrixTranspose(const Matrix* a);
+Matrix* AddLinearCombination(Matrix* a, int row, const void* alphas);
 
-void MatrixPrint(Matrix* m);
+void MatrixPrint(const Matrix* m);
 
 #endif //UNTITLED2_MATRIX_H

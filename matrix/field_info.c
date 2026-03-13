@@ -1,58 +1,55 @@
 #include "field_info.h"
 #include <stdio.h>
-#include <stdlib.h>
 
-void int_add(void* a, void* b, void* result){
-    *(int*)result = *(int*)a + *(int*)b;
+/* -------- INT -------- */
+
+static void int_add(const void* a, const void* b, void* result){
+    *(int*)result = *(const int*)a + *(const int*)b;
 }
 
-void int_mul(void* a, void* b, void* result){
-    *(int*)result = *(int*)a * *(int*)b;
+static void int_mul(const void* a, const void* b, void* result){
+    *(int*)result = *(const int*)a * *(const int*)b;
 }
 
-void int_print(void* a){
-    printf("%d " , *(int*)a);
+static void int_print(const void* a){
+    printf("%d ", *(const int*)a);
 }
 
-FieldInfo* GetIntFieldInfo() {
-    static FieldInfo* info = NULL;
+const FieldInfo* GetIntFieldInfo()
+{
+    static const FieldInfo info = {
+            sizeof(int),
+            int_add,
+            int_mul,
+            int_print
+    };
 
-    if (info == NULL){
-        info = (FieldInfo*)malloc(sizeof(FieldInfo));
-        info->size = sizeof(int);
-        info->add = int_add;
-        info->mul = int_mul;
-        info->print = int_print;
-    }
-    return info;
+    return &info;
 }
 
-void double_add(void* a, void* b, void* result){
-    *(double*)result = *(double*)a + *(double*)b;
+
+/* -------- DOUBLE -------- */
+
+static void double_add(const void* a, const void* b, void* result){
+    *(double*)result = *(const double*)a + *(const double*)b;
 }
 
-void double_mul(void* a, void* b, void* result){
-    *(double*)result = *(double*)a * *(double*)b;
+static void double_mul(const void* a, const void* b, void* result){
+    *(double*)result = *(const double*)a * *(const double*)b;
 }
 
-void double_print(void* a){
-    printf("%f " , *(double*)a);
+static void double_print(const void* a){
+    printf("%f ", *(const double*)a);
 }
 
-FieldInfo* GetDoubleFieldInfo() {
-    static FieldInfo* info = NULL;
+const FieldInfo* GetDoubleFieldInfo()
+{
+    static const FieldInfo info = {
+            sizeof(double),
+            double_add,
+            double_mul,
+            double_print
+    };
 
-    if (info == NULL){
-        info = (FieldInfo*)malloc(sizeof(FieldInfo));
-        if (info == NULL){
-            printf("Memory allocation error\n");
-            return NULL;
-        }
-
-        info->size = sizeof(double);
-        info->add = double_add;
-        info->mul = double_mul;
-        info->print = double_print;
-    }
-    return info;
+    return &info;
 }
