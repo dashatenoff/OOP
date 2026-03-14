@@ -30,7 +30,9 @@ static void double_add(const void* a, const void* b, void* result){
 }
 
 static void double_mul(const void* a, const void* b, void* result){
-    *(double*)result = *(const double*)a * *(const double*)b;
+    const double * pa = (const double*)a;
+    const double * pb = (const double*)b;
+    *(double*)result = (*pa) * (*pb);
 }
 
 static void double_print(const void* a){

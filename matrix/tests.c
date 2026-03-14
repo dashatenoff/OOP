@@ -306,6 +306,39 @@ void TestPerformanceLarge()
     MatrixFree(C);
 }
 
+void Testbl(){
+    FieldInfo* type = GetIntFieldInfo();
+    Matrix *a = MatrixCreate(2, 2,type);
+    int v;
+    v = 1;
+    MatrixSet(a, 0, 0, &v);
+    v = 0;
+    MatrixSet(a, 0, 1, &v);
+    v = 0;
+    MatrixSet(a, 1, 0, &v);
+    v = 1;
+    MatrixSet(a, 1, 1, &v);
+
+    Matrix *b = MatrixCreate(2, 2,type);
+    v = 1;
+    MatrixSet(b, 0, 0, &v);
+    v = 2;
+    MatrixSet(b, 0, 1, &v);
+    v = 3;
+    MatrixSet(b, 1, 0, &v);
+    v = 4;
+    MatrixSet(b, 1, 1, &v);
+
+    clock_t start = clock();
+    Matrix *c = MatrixAdd(a, b);
+    clock_t end = clock();
+    printf("\nTestbl\n");
+    printf("Time: %.6f sec\n", GetTime(start,end));
+    MatrixPrint(c);
+    MatrixFree(a);
+    MatrixFree(b);
+    MatrixFree(c);
+}
 /* ================= RUN ALL ================= */
 
 void RunAllTests()
@@ -319,6 +352,7 @@ void RunAllTests()
     TestDoubleRectangular();
     TestErrors();
     TestPerformanceLarge();
+    Testbl();
 
     printf("\n====================================\n");
     printf("ALL TESTS FINISHED\n");
