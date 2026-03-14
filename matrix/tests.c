@@ -333,8 +333,15 @@ void Testbl(){
     Matrix *c = MatrixAdd(a, b);
     clock_t end = clock();
     printf("\nTestbl\n");
-    printf("Time: %.6f sec\n", GetTime(start,end));
+
+    printf("Expected:\n");
+    printf("2 2\n3 5\n");
+
+    printf("\nResult:\n");
     MatrixPrint(c);
+
+    printf("Time: %.6f sec\n", GetTime(start,end));
+
     MatrixFree(a);
     MatrixFree(b);
     MatrixFree(c);
