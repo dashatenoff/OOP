@@ -1,8 +1,6 @@
 #include "field_info.h"
 #include <stdio.h>
 
-/* -------- INT -------- */
-
 static void int_add(const void* a, const void* b, void* result){
     *(int*)result = *(const int*)a + *(const int*)b;
 }
@@ -26,9 +24,6 @@ const FieldInfo* GetIntFieldInfo()
 
     return &info;
 }
-
-
-/* -------- DOUBLE -------- */
 
 static void double_add(const void* a, const void* b, void* result){
     *(double*)result = *(const double*)a + *(const double*)b;

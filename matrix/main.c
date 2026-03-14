@@ -6,34 +6,57 @@
 #include "field_info.h"
 #include "tests.h"
 
-Matrix* InputMatrix(FieldInfo* type){
+static Matrix* InputMatrix(const FieldInfo* type)
+{
     int rows, cols;
-    printf("Enter number of rows and columns: ");
-    scanf("%d %d", &rows, &cols);
 
-    Matrix* m = MatrixCreate(rows, cols, type);
-    if (m==NULL){
-        printf("Memory error\n");
+    printf("Enter number of rows and columns: ");
+    if (scanf("%d %d", &rows, &cols) != 2) {
+        fprintf(stderr, "Input error\n");
         return NULL;
     }
+
+    Matrix* matrix = MatrixCreate(rows, cols, type);
+    if (matrix == NULL) {
+        fprintf(stderr, "Memory allocation failed\n");
+        return NULL;
+    }
+
     printf("Enter elements:\n");
-    for (int i = 0; i < rows; i++){
+
+    for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
+
             if (type->size == sizeof(int)) {
-                int v;
-                scanf("%d", &v);
-                MatrixSet(m, i, j , &v);
-            } else {
-                double v;
-                scanf("%lf", &v);
-                MatrixSet(m, i, j, &v);
+                int value;
+
+                if (scanf("%d", &value) != 1) {
+                    fprintf(stderr, "Input error\n");
+                    MatrixFree(matrix);
+                    return NULL;
+                }
+
+                MatrixSet(matrix, i, j, &value);
+            }
+            else {
+                double value;
+
+                if (scanf("%lf", &value) != 1) {
+                    fprintf(stderr, "Input error\n");
+                    MatrixFree(matrix);
+                    return NULL;
+                }
+
+                MatrixSet(matrix, i, j, &value);
             }
         }
     }
-    return m;
+
+    return matrix;
 }
 
-void PrintMenu(){
+static void PrintMenu(void)
+{
     printf("\nMenu:\n");
     printf("1 - Add matrices\n");
     printf("2 - Multiply matrices\n");
@@ -43,13 +66,18 @@ void PrintMenu(){
     printf("0 - Exit\n");
 }
 
-int main()
+int main(void)
 {
     int typeChoice;
-    printf("Choose type (1-int, 2-double): ");
-    scanf("%d", &typeChoice);
 
-    FieldInfo* type;
+    printf("Choose type (1-int, 2-double): ");
+    if (scanf("%d", &typeChoice) != 1) {
+        fprintf(stderr, "Input error\n");
+        return 1;
+    }
+
+    const FieldInfo* type;
+
     if (typeChoice == 1)
         type = GetIntFieldInfo();
     else
@@ -60,26 +88,34 @@ int main()
     while (cmd != 0)
     {
         PrintMenu();
+
         printf("Command: ");
-        scanf("%d", &cmd);
+        if (scanf("%d", &cmd) != 1) {
+            fprintf(stderr, "Input error\n");
+            break;
+        }
 
         if (cmd == 1)
         {
-
-
             printf("Matrix A:\n");
             Matrix* A = InputMatrix(type);
 
             printf("Matrix B:\n");
             Matrix* B = InputMatrix(type);
+
+            if (A == NULL || B == NULL) {
+                MatrixFree(A);
+                MatrixFree(B);
+                continue;
+            }
 
             clock_t start = clock();
             Matrix* R = MatrixAdd(A, B);
             clock_t end = clock();
+
             if (R == NULL)
                 printf("Error: incompatible sizes or memory error\n");
-            else
-            {
+            else {
                 printf("Result:\n");
                 MatrixPrint(R);
                 MatrixFree(R);
@@ -92,7 +128,7 @@ int main()
             printf("Time: %f seconds\n", time_spent);
         }
 
-        else if (cmd == 2) // Multiply
+        else if (cmd == 2)
         {
             printf("Matrix A:\n");
             Matrix* A = InputMatrix(type);
@@ -100,13 +136,19 @@ int main()
             printf("Matrix B:\n");
             Matrix* B = InputMatrix(type);
 
+            if (A == NULL || B == NULL) {
+                MatrixFree(A);
+                MatrixFree(B);
+                continue;
+            }
+
             clock_t start = clock();
             Matrix* R = MatrixMultiply(A, B);
             clock_t end = clock();
+
             if (R == NULL)
                 printf("Error: incompatible sizes\n");
-            else
-            {
+            else {
                 printf("Result:\n");
                 MatrixPrint(R);
                 MatrixFree(R);
@@ -114,42 +156,52 @@ int main()
 
             MatrixFree(A);
             MatrixFree(B);
+
             double time_spent = (double)(end - start) / CLOCKS_PER_SEC;
             printf("Time: %f seconds\n", time_spent);
-
         }
 
-        else if (cmd == 3) // Transpose
+        else if (cmd == 3)
         {
             Matrix* A = InputMatrix(type);
+            if (A == NULL)
+                continue;
+
             clock_t start = clock();
             Matrix* R = MatrixTranspose(A);
             clock_t end = clock();
+
             if (R == NULL)
                 printf("Error\n");
-            else
-            {
+            else {
                 MatrixPrint(R);
                 MatrixFree(R);
             }
 
             MatrixFree(A);
+
             double time_spent = (double)(end - start) / CLOCKS_PER_SEC;
             printf("Time: %f seconds\n", time_spent);
         }
 
-        else if (cmd == 4) // Linear combination
+        else if (cmd == 4)
         {
             Matrix* A = InputMatrix(type);
+            if (A == NULL)
+                continue;
 
             int row;
-            printf("Row index: ");
-            scanf("%d", &row);
 
-            void* betas = malloc(A->rows * type->size);
-            if (betas == NULL)
-            {
-                printf("Memory error\n");
+            printf("Row index: ");
+            if (scanf("%d", &row) != 1) {
+                fprintf(stderr, "Input error\n");
+                MatrixFree(A);
+                continue;
+            }
+
+            void* betas = malloc((size_t)A->rows * type->size);
+            if (betas == NULL) {
+                fprintf(stderr, "Memory allocation failed\n");
                 MatrixFree(A);
                 continue;
             }
@@ -158,35 +210,34 @@ int main()
 
             for (int i = 0; i < A->rows; i++)
             {
-                if (type->size == sizeof(int))
-                {
-                    int v;
-                    scanf("%d", &v);
-                    memcpy((char*)betas + i*type->size, &v, type->size);
+                if (type->size == sizeof(int)) {
+                    int value;
+                    scanf("%d", &value);
+                    memcpy((char*)betas + i * type->size, &value, type->size);
                 }
-                else
-                {
-                    double v;
-                    scanf("%lf", &v);
-                    memcpy((char*)betas + i*type->size, &v, type->size);
+                else {
+                    double value;
+                    scanf("%lf", &value);
+                    memcpy((char*)betas + i * type->size, &value, type->size);
                 }
             }
+
             clock_t start = clock();
             Matrix* R = AddLinearCombination(A, row, betas);
             clock_t end = clock();
+
             if (R == NULL)
                 printf("Error\n");
-            else
-            {
+            else {
                 MatrixPrint(R);
                 MatrixFree(R);
+
                 double time_spent = (double)(end - start) / CLOCKS_PER_SEC;
                 printf("Time: %f seconds\n", time_spent);
             }
 
             free(betas);
             MatrixFree(A);
-
         }
 
         else if (cmd == 5)

@@ -19,7 +19,7 @@ void MatrixSet(Matrix* matrix, int row, int col, const void* value);
 Matrix* MatrixAdd(const Matrix* a, const Matrix* b);
 Matrix* MatrixMultiply(const Matrix* a, const Matrix* b);
 Matrix* MatrixTranspose(const Matrix* a);
-Matrix* AddLinearCombination(Matrix* a, int row, const void* alphas);
+Matrix* AddLinearCombination(const Matrix* a, int row, const void* alphas);
 
 void MatrixPrint(const Matrix* m);
 
