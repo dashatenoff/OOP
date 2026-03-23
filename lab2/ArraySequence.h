@@ -1,0 +1,8 @@
+//
+// Created by dasha on 16/03/2026.
+//
+
+#ifndef UNTITLED2_ARRAYSEQUENCE_H
+#define UNTITLED2_ARRAYSEQUENCE_H
+
+#endif //UNTITLED2_ARRAYSEQUENCE_H
