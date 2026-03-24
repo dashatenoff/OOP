@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include <assert.h>
 
 #include "matrix.h"
 #include "field_info.h"
@@ -23,25 +24,28 @@ int MatrixEquals(const Matrix* A, const Matrix* B, double eps)
 {
     if (!A || !B) return 0;
     if (A->rows != B->rows || A->cols != B->cols) return 0;
+    if (A->type != B->type) return 0;
 
-    for(int i=0;i<A->rows;i++)
-        for(int j=0;j<A->cols;j++)
+    for(int i = 0; i < A->rows; i++)
+    {
+        for(int j = 0; j < A->cols; j++)
         {
             if(A->type == GetIntFieldInfo())
             {
-                int a = *(int*)MatrixGet(A,i,j);
-                int b = *(int*)MatrixGet(B,i,j);
+                int a = *(int*)MatrixGet(A, i, j);
+                int b = *(int*)MatrixGet(B, i, j);
 
                 if(a != b) return 0;
             }
             else
             {
-                double a = *(double*)MatrixGet(A,i,j);
-                double b = *(double*)MatrixGet(B,i,j);
+                double a = *(double*)MatrixGet(A, i, j);
+                double b = *(double*)MatrixGet(B, i, j);
 
-                if(fabs(a-b) > eps) return 0;
+                if(fabs(a - b) > eps) return 0;
             }
         }
+    }
 
     return 1;
 }
@@ -52,11 +56,11 @@ void PrintMatrix(const Matrix* M)
 {
     if(!M) return;
 
-    for(int i=0;i<M->rows;i++)
+    for(int i = 0; i < M->rows; i++)
     {
-        for(int j=0;j<M->cols;j++)
+        for(int j = 0; j < M->cols; j++)
         {
-            M->type->print(MatrixGet(M,i,j));
+            M->type->print(MatrixGet(M, i, j));
             printf(" ");
         }
         printf("\n");
@@ -70,21 +74,23 @@ void TestCreateSetGet()
     printf("\n========== TestCreateSetGet ==========\n");
 
     FieldInfo* type = GetIntFieldInfo();
+    Matrix* A = MatrixCreate(2, 2, type);
 
-    Matrix* A = MatrixCreate(2,2,type);
+    assert(A != NULL);
 
     int v;
 
-    v=5; MatrixSet(A,0,0,&v);
-    v=7; MatrixSet(A,0,1,&v);
-    v=9; MatrixSet(A,1,0,&v);
-    v=11; MatrixSet(A,1,1,&v);
+    v = 5; MatrixSet(A, 0, 0, &v);
+    v = 7; MatrixSet(A, 0, 1, &v);
+    v = 9; MatrixSet(A, 1, 0, &v);
+    v = 11; MatrixSet(A, 1, 1, &v);
 
-    printf("Expected matrix:\n");
-    printf("5 7\n9 11\n\n");
+    assert(*(int*)MatrixGet(A, 0, 0) == 5);
+    assert(*(int*)MatrixGet(A, 0, 1) == 7);
+    assert(*(int*)MatrixGet(A, 1, 0) == 9);
+    assert(*(int*)MatrixGet(A, 1, 1) == 11);
 
-    printf("Program matrix:\n");
-    PrintMatrix(A);
+    PrintResult("Create/Set/Get", 1);
 
     MatrixFree(A);
 }
@@ -96,110 +102,98 @@ void TestIntAll()
     printf("\n========== TestIntAll ==========\n");
 
     FieldInfo* type = GetIntFieldInfo();
+    Matrix* A = MatrixCreate(2, 2, type);
 
-    Matrix* A = MatrixCreate(2,2,type);
+    assert(A != NULL);
 
     int v;
 
-    v=1; MatrixSet(A,0,0,&v);
-    v=2; MatrixSet(A,0,1,&v);
-    v=3; MatrixSet(A,1,0,&v);
-    v=4; MatrixSet(A,1,1,&v);
-
-    printf("\nMatrix A:\n");
-    PrintMatrix(A);
+    v = 1; MatrixSet(A, 0, 0, &v);
+    v = 2; MatrixSet(A, 0, 1, &v);
+    v = 3; MatrixSet(A, 1, 0, &v);
+    v = 4; MatrixSet(A, 1, 1, &v);
 
     /* -------- ADD -------- */
 
-    printf("\n--- ADD ---\n");
-    printf("Expected:\n1+1 2+2\n3+3 4+4\n");
-
     clock_t start = clock();
-    Matrix* S = MatrixAdd(A,A);
+    Matrix* S = MatrixAdd(A, A);
     clock_t end = clock();
 
-    printf("\nResult:\n");
-    PrintMatrix(S);
+    assert(S != NULL);
 
-    Matrix* S_true = MatrixCreate(2,2,type);
+    Matrix* S_true = MatrixCreate(2, 2, type);
+    assert(S_true != NULL);
 
-    v=2; MatrixSet(S_true,0,0,&v);
-    v=4; MatrixSet(S_true,0,1,&v);
-    v=6; MatrixSet(S_true,1,0,&v);
-    v=8; MatrixSet(S_true,1,1,&v);
+    v = 2; MatrixSet(S_true, 0, 0, &v);
+    v = 4; MatrixSet(S_true, 0, 1, &v);
+    v = 6; MatrixSet(S_true, 1, 0, &v);
+    v = 8; MatrixSet(S_true, 1, 1, &v);
 
-    PrintResult("ADD", MatrixEquals(S,S_true,1e-9));
-    printf("Time: %.6f sec\n", GetTime(start,end));
+    PrintResult("ADD", MatrixEquals(S, S_true, 1e-9));
+    assert(MatrixEquals(S, S_true, 1e-9));
+    printf("Time: %.6f sec\n", GetTime(start, end));
 
     /* -------- MULTIPLY -------- */
 
-    printf("\n--- MULTIPLY ---\n");
-    printf("C[0][0] = 1*1 + 2*3 = 7\n");
-    printf("C[0][1] = 1*2 + 2*4 = 10\n");
-    printf("C[1][0] = 3*1 + 4*3 = 15\n");
-    printf("C[1][1] = 3*2 + 4*4 = 22\n");
-
     start = clock();
-    Matrix* M = MatrixMultiply(A,A);
+    Matrix* M = MatrixMultiply(A, A);
     end = clock();
 
-    printf("\nResult:\n");
-    PrintMatrix(M);
+    assert(M != NULL);
 
-    Matrix* M_true = MatrixCreate(2,2,type);
+    Matrix* M_true = MatrixCreate(2, 2, type);
+    assert(M_true != NULL);
 
-    v=7; MatrixSet(M_true,0,0,&v);
-    v=10; MatrixSet(M_true,0,1,&v);
-    v=15; MatrixSet(M_true,1,0,&v);
-    v=22; MatrixSet(M_true,1,1,&v);
+    v = 7;  MatrixSet(M_true, 0, 0, &v);
+    v = 10; MatrixSet(M_true, 0, 1, &v);
+    v = 15; MatrixSet(M_true, 1, 0, &v);
+    v = 22; MatrixSet(M_true, 1, 1, &v);
 
-    PrintResult("MULTIPLY", MatrixEquals(M,M_true,1e-9));
-    printf("Time: %.6f sec\n", GetTime(start,end));
+    PrintResult("MULTIPLY", MatrixEquals(M, M_true, 1e-9));
+    assert(MatrixEquals(M, M_true, 1e-9));
+    printf("Time: %.6f sec\n", GetTime(start, end));
 
     /* -------- TRANSPOSE -------- */
-
-    printf("\n--- TRANSPOSE ---\n");
 
     start = clock();
     Matrix* T = MatrixTranspose(A);
     end = clock();
 
-    printf("Result:\n");
-    PrintMatrix(T);
+    assert(T != NULL);
 
-    Matrix* T_true = MatrixCreate(2,2,type);
+    Matrix* T_true = MatrixCreate(2, 2, type);
+    assert(T_true != NULL);
 
-    v=1; MatrixSet(T_true,0,0,&v);
-    v=3; MatrixSet(T_true,0,1,&v);
-    v=2; MatrixSet(T_true,1,0,&v);
-    v=4; MatrixSet(T_true,1,1,&v);
+    v = 1; MatrixSet(T_true, 0, 0, &v);
+    v = 3; MatrixSet(T_true, 0, 1, &v);
+    v = 2; MatrixSet(T_true, 1, 0, &v);
+    v = 4; MatrixSet(T_true, 1, 1, &v);
 
-    PrintResult("TRANSPOSE", MatrixEquals(T,T_true,1e-9));
-    printf("Time: %.6f sec\n", GetTime(start,end));
+    PrintResult("TRANSPOSE", MatrixEquals(T, T_true, 1e-9));
+    assert(MatrixEquals(T, T_true, 1e-9));
+    printf("Time: %.6f sec\n", GetTime(start, end));
 
     /* -------- LINEAR COMB -------- */
 
-    printf("\n--- LINEAR COMBINATION ---\n");
-    printf("row0 = row0 + 2*row1\n");
-
-    int betas[2] = {0,2};
+    int betas[2] = {0, 2};
 
     start = clock();
-    Matrix* L = AddLinearCombination(A,0,betas);
+    Matrix* L = AddLinearCombination(A, 0, betas);
     end = clock();
 
-    printf("Result:\n");
-    PrintMatrix(L);
+    assert(L != NULL);
 
-    Matrix* L_true = MatrixCreate(2,2,type);
+    Matrix* L_true = MatrixCreate(2, 2, type);
+    assert(L_true != NULL);
 
-    v=7; MatrixSet(L_true,0,0,&v);
-    v=10; MatrixSet(L_true,0,1,&v);
-    v=3; MatrixSet(L_true,1,0,&v);
-    v=4; MatrixSet(L_true,1,1,&v);
+    v = 7; MatrixSet(L_true, 0, 0, &v);
+    v = 10; MatrixSet(L_true, 0, 1, &v);
+    v = 3; MatrixSet(L_true, 1, 0, &v);
+    v = 4; MatrixSet(L_true, 1, 1, &v);
 
-    PrintResult("LINEAR_COMB", MatrixEquals(L,L_true,1e-9));
-    printf("Time: %.6f sec\n", GetTime(start,end));
+    PrintResult("LINEAR_COMB", MatrixEquals(L, L_true, 1e-9));
+    assert(MatrixEquals(L, L_true, 1e-9));
+    printf("Time: %.6f sec\n", GetTime(start, end));
 
     MatrixFree(A);
     MatrixFree(S);
@@ -219,33 +213,45 @@ void TestDoubleRectangular()
     printf("\n========== TestDoubleRectangular ==========\n");
 
     FieldInfo* type = GetDoubleFieldInfo();
+    Matrix* A = MatrixCreate(2, 3, type);
 
-    Matrix* A = MatrixCreate(2,3,type);
+    assert(A != NULL);
 
     double v;
-    int cnt=1;
+    int cnt = 1;
 
-    for(int i=0;i<2;i++)
-        for(int j=0;j<3;j++)
+    for(int i = 0; i < 2; i++)
+    {
+        for(int j = 0; j < 3; j++)
         {
             v = (double)cnt++;
-            MatrixSet(A,i,j,&v);
+            MatrixSet(A, i, j, &v);
         }
-
-    printf("\nMatrix A:\n");
-    PrintMatrix(A);
+    }
 
     clock_t start = clock();
     Matrix* T = MatrixTranspose(A);
     clock_t end = clock();
 
-    printf("\nTranspose:\n");
-    PrintMatrix(T);
+    assert(T != NULL);
 
-    printf("Time: %.6f sec\n", GetTime(start,end));
+    Matrix* T_true = MatrixCreate(3, 2, type);
+    assert(T_true != NULL);
+
+    v = 1.0; MatrixSet(T_true, 0, 0, &v);
+    v = 4.0; MatrixSet(T_true, 0, 1, &v);
+    v = 2.0; MatrixSet(T_true, 1, 0, &v);
+    v = 5.0; MatrixSet(T_true, 1, 1, &v);
+    v = 3.0; MatrixSet(T_true, 2, 0, &v);
+    v = 6.0; MatrixSet(T_true, 2, 1, &v);
+
+    PrintResult("DOUBLE_RECTANGULAR_TRANSPOSE", MatrixEquals(T, T_true, 1e-9));
+    assert(MatrixEquals(T, T_true, 1e-9));
+    printf("Time: %.6f sec\n", GetTime(start, end));
 
     MatrixFree(A);
     MatrixFree(T);
+    MatrixFree(T_true);
 }
 
 /* ================= ERROR TESTS ================= */
@@ -256,17 +262,28 @@ void TestErrors()
 
     FieldInfo* type = GetIntFieldInfo();
 
-    Matrix* A = MatrixCreate(2,2,type);
-    Matrix* B = MatrixCreate(3,3,type);
+    Matrix* A = MatrixCreate(2, 2, type);
+    Matrix* B = MatrixCreate(3, 3, type);
 
-    PrintResult("ADD size mismatch", MatrixAdd(A,B)==NULL);
-    PrintResult("MULTIPLY mismatch", MatrixMultiply(A,B)==NULL);
-    PrintResult("NULL argument", MatrixAdd(NULL,A)==NULL);
+    assert(A != NULL);
+    assert(B != NULL);
 
-    int betas[2]={1,1};
+    Matrix* add_result = MatrixAdd(A, B);
+    PrintResult("ADD size mismatch", add_result == NULL);
+    assert(add_result == NULL);
 
-    PrintResult("BAD ROW",
-                AddLinearCombination(A,10,betas)==NULL);
+    Matrix* mult_result = MatrixMultiply(A, B);
+    PrintResult("MULTIPLY mismatch", mult_result == NULL);
+    assert(mult_result == NULL);
+
+    Matrix* null_result = MatrixAdd(NULL, A);
+    PrintResult("NULL argument", null_result == NULL);
+    assert(null_result == NULL);
+
+    int betas[2] = {1, 1};
+    Matrix* bad_row_result = AddLinearCombination(A, 10, betas);
+    PrintResult("BAD ROW", bad_row_result == NULL);
+    assert(bad_row_result == NULL);
 
     MatrixFree(A);
     MatrixFree(B);
@@ -280,65 +297,87 @@ void TestPerformanceLarge()
 
     FieldInfo* type = GetDoubleFieldInfo();
 
-    int n=300;
+    int n = 300;
 
-    Matrix* A = MatrixCreate(n,n,type);
-    Matrix* B = MatrixCreate(n,n,type);
+    Matrix* A = MatrixCreate(n, n, type);
+    Matrix* B = MatrixCreate(n, n, type);
 
-    double one=1.0;
+    assert(A != NULL);
+    assert(B != NULL);
 
-    for(int i=0;i<n;i++)
-        for(int j=0;j<n;j++)
+    double one = 1.0;
+
+    for(int i = 0; i < n; i++)
+    {
+        for(int j = 0; j < n; j++)
         {
-            MatrixSet(A,i,j,&one);
-            MatrixSet(B,i,j,&one);
+            MatrixSet(A, i, j, &one);
+            MatrixSet(B, i, j, &one);
         }
+    }
 
     clock_t start = clock();
-    Matrix* C = MatrixMultiply(A,B);
+    Matrix* C = MatrixMultiply(A, B);
     clock_t end = clock();
 
-    printf("Multiply %dx%d time: %.3f sec\n",
-           n,n,GetTime(start,end));
+    assert(C != NULL);
+
+    printf("Multiply %dx%d time: %.3f sec\n", n, n, GetTime(start, end));
 
     MatrixFree(A);
     MatrixFree(B);
     MatrixFree(C);
 }
 
-void Testbl(){
-    FieldInfo* type = GetIntFieldInfo();
-    Matrix *a = MatrixCreate(2, 2,type);
-    int v;
-    v = 1;
-    MatrixSet(a, 0, 0, &v);
-    v = 0;
-    MatrixSet(a, 0, 1, &v);
-    v = 0;
-    MatrixSet(a, 1, 0, &v);
-    v = 1;
-    MatrixSet(a, 1, 1, &v);
+void Testbl()
+{
+    printf("\n========== Testbl ==========\n");
 
-    Matrix *b = MatrixCreate(2, 2,type);
-    v = 1;
-    MatrixSet(b, 0, 0, &v);
-    v = 2;
-    MatrixSet(b, 0, 1, &v);
-    v = 3;
-    MatrixSet(b, 1, 0, &v);
-    v = 4;
-    MatrixSet(b, 1, 1, &v);
+    FieldInfo* type = GetIntFieldInfo();
+
+    Matrix *a = MatrixCreate(2, 2, type);
+    Matrix *b = MatrixCreate(2, 2, type);
+
+    assert(a != NULL);
+    assert(b != NULL);
+
+    int v;
+
+    v = 1; MatrixSet(a, 0, 0, &v);
+    v = 0; MatrixSet(a, 0, 1, &v);
+    v = 0; MatrixSet(a, 1, 0, &v);
+    v = 1; MatrixSet(a, 1, 1, &v);
+
+    v = 1; MatrixSet(b, 0, 0, &v);
+    v = 2; MatrixSet(b, 0, 1, &v);
+    v = 3; MatrixSet(b, 1, 0, &v);
+    v = 4; MatrixSet(b, 1, 1, &v);
 
     clock_t start = clock();
     Matrix *c = MatrixAdd(a, b);
     clock_t end = clock();
-    printf("\nTestbl\n");
-    printf("Time: %.6f sec\n", GetTime(start,end));
-    MatrixPrint(c);
+
+    assert(c != NULL);
+
+    Matrix *c_true = MatrixCreate(2, 2, type);
+    assert(c_true != NULL);
+
+    v = 2; MatrixSet(c_true, 0, 0, &v);
+    v = 2; MatrixSet(c_true, 0, 1, &v);
+    v = 3; MatrixSet(c_true, 1, 0, &v);
+    v = 5; MatrixSet(c_true, 1, 1, &v);
+
+    PrintResult("Testbl ADD", MatrixEquals(c, c_true, 1e-9));
+    assert(MatrixEquals(c, c_true, 1e-9));
+
+    printf("Time: %.6f sec\n", GetTime(start, end));
+
     MatrixFree(a);
     MatrixFree(b);
     MatrixFree(c);
+    MatrixFree(c_true);
 }
+
 /* ================= RUN ALL ================= */
 
 void RunAllTests()

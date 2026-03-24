@@ -3,6 +3,8 @@ project(OOP)
 
 set(CMAKE_C_STANDARD 11)
 
+add_compile_options(-Wall -Wextra)
+
 add_executable(project
         main.c
         matrix.c
