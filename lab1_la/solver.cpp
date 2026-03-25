@@ -2,13 +2,12 @@
 #include <vector>
 #include <cmath>
 #include <random>
-#include <chrono>
 #include <iomanip>
 #include <stdexcept>
 
 using Matrix = std::vector<std::vector<double>>;
 using Vector = std::vector<double>;
-const double EPS = 1e-12;
+const double EPS = 1e-18;
 
 void printVector(const Vector& v){
     for (double x: v){
@@ -151,7 +150,28 @@ Vector solveLU(const Matrix& A, const Vector& b){
     return x;
 }
 
-int main() {
-    std::cout << "Hello\n";
-    return 0;
+Matrix generateMatrix(int n) {
+    static std::mt19937 gen(42);
+    std::uniform_real_distribution<double> dist(-1.0, 1.0);
+
+    Matrix A(n, Vector(n));
+
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            A[i][j] = dist(gen);
+
+    return A;
 }
+
+Vector generateVector(int n) {
+    static std::mt19937 gen(42);
+    std::uniform_real_distribution<double> dist(-1.0, 1.0);
+
+    Vector b(n);
+
+    for (int i = 0; i < n; i++)
+        b[i] = dist(gen);
+
+    return b;
+}
+
