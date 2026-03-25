@@ -1,8 +1,6 @@
 # ninja log v6
-250	932	7960723856201778	CMakeFiles/project.dir/field_info.c.obj	53759ee6ad5d5adf
-231	956	7960723856012491	CMakeFiles/project.dir/matrix.c.obj	9e7b7e7fb20fd9e8
-194	956	7960723855652879	CMakeFiles/project.dir/main.c.obj	14c8b3475e592ad7
-267	985	7960723856368590	CMakeFiles/project.dir/tests.c.obj	debbe360199d3f7d
-985	2240	7960723863552800	project.exe	3d0ced8ec88c9383
-100	331	7960727799984750	CMakeFiles/project.dir/tests.c.obj	debbe360199d3f7d
-332	524	7960727802295765	project.exe	3d0ced8ec88c9383
+26	210	7960798943446886	CMakeFiles/project.dir/field_info.c.obj	53759ee6ad5d5adf
+242	409	7960798945615295	project.exe	3d0ced8ec88c9383
+19	222	7960798943382177	CMakeFiles/project.dir/matrix.c.obj	9e7b7e7fb20fd9e8
+11	216	7960798943302067	CMakeFiles/project.dir/main.c.obj	14c8b3475e592ad7
+33	241	7960798943512029	CMakeFiles/project.dir/tests.c.obj	debbe360199d3f7d
