@@ -2,20 +2,26 @@
 #ifndef LAB2_MUTABLEARRAYSEQUENCE_H
 #define LAB2_MUTABLEARRAYSEQUENCE_H
 
+#include "ArraySequence.h"
+
 template<class T>
-class MutableArraySequence : public ArraySequence<T>{
+class MutableArraySequence : public ArraySequence<T> {
 public:
-    using ArraySequence<T>::ArraySequence;
+
+    MutableArraySequence(DynamicArray<T>* arr)
+            : ArraySequence<T>(arr) {}
 
 protected:
-    Sequence<T>* Instance() override{
+
+    ArraySequence<T>* Instance() override {
         return this;
     }
 
-    Sequence<T>* Clone() const override {
-        return new MutableArraySequence<T>(*this);
+    ArraySequence<T>* Clone() const override {
+        return new MutableArraySequence<T>(
+                new DynamicArray<T>(*this->items)
+        );
     }
-
 };
 
 #endif //LAB2_MUTABLEARRAYSEQUENCE_H

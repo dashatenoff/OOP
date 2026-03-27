@@ -5,14 +5,15 @@
 #ifndef UNTITLED2_ARRAYSEQUENCE_H
 #define UNTITLED2_ARRAYSEQUENCE_H
 
+template<class T>
+class MutableArraySequence;
+
 template <class T>
 class ArraySequence : public Sequence<T> {
-private:
-    DynamicArray<T>* items;
-
 protected:
-    virtual Sequence<T>* Instance() = 0;
-    virtual Sequence<T>* Clone() const = 0;
+    DynamicArray<T>* items;
+    virtual ArraySequence<T>* Instance() = 0;
+    virtual ArraySequence<T>* Clone() const = 0;
 
 public:
     ArraySequence(DynamicArray<T>* arr) {

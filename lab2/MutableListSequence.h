@@ -6,16 +6,20 @@
 template<class T>
 class MutableListSequence : public ListSequence<T> {
 public:
-    MutableListSequence(LinkedList<T>* list) : ListSequence<T>(list) {}
+
+    MutableListSequence(LinkedList<T>* list)
+            : ListSequence<T>(list) {}
 
 protected:
-    Sequence<T>* Instance() override {
+
+    ListSequence<T>* Instance() override {
         return this;
     }
 
-    Sequence<T>* Clone() const override {
-        return new MutableListSequence<T>(new LinkedList<T>(*this->items));
+    ListSequence<T>* Clone() const override {
+        return new MutableListSequence<T>(
+                new LinkedList<T>(*this->items)
+        );
     }
 };
-
 #endif

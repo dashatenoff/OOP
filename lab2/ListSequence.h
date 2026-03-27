@@ -4,14 +4,15 @@
 #include "Sequence.h"
 #include "LinkedList.h"
 
+template<class T>
+class MutableListSequence;
+
 template <class T>
 class ListSequence : public Sequence<T> {
-private:
-    LinkedList<T>* items;
-
 protected:
-    virtual Sequence<T>* Instance() = 0;
-    virtual Sequence<T>* Clone() const = 0;
+    LinkedList<T>* items;
+    virtual ListSequence<T>* Instance() = 0;
+    virtual ListSequence<T>* Clone() const = 0;
 
 public:
     ListSequence(LinkedList<T>* list) {

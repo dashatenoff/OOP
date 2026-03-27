@@ -1,6 +1,9 @@
 #include <iostream>
+#include "DynamicArray.h"
+#include "LinkedList.h"
 #include "MutableArraySequence.h"
 #include "MutableListSequence.h"
+#include "test.h"
 
 using namespace std;
 

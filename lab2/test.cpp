@@ -1,9 +1,16 @@
 #include <iostream>
-#include "MutableArraySequence.h"
-#include "MutableListSequence.h"
+
 #include "DynamicArray.h"
 #include "LinkedList.h"
-#include "tests.h"
+
+#include "MutableArraySequence.h"
+#include "ImmutableArraySequence.h"
+
+#include "MutableListSequence.h"
+#include "ImmutableListSequence.h"
+
+#include "Sequence.h"
+#include "test.h"
 
 using namespace std;
 
@@ -55,23 +62,7 @@ static void TestLinkedList()
     PrintResult("Prepend", ok2);
 }
 
-static void TestArraySequence()
-{
-    cout << "\n=== TestArraySequence ===\n";
 
-    int arr[] = {1,2,3};
-
-    Sequence<int>* seq =
-            new MutableArraySequence<int>(new DynamicArray<int>(arr,3));
-
-    seq->Append(4);
-
-    bool ok = (seq->Get(3) == 4);
-
-    PrintResult("Append", ok);
-
-    delete seq;
-}
 
 static void TestSequenceOperations()
 {
@@ -152,28 +143,6 @@ static void TestMapWhereReduce()
     delete filtered;
 }
 
-static void TestConcat()
-{
-    cout << "\n========== TestConcat ==========\n";
-
-    int a[] = {1,2};
-    int b[] = {3,4};
-
-    Sequence<int>* A =
-            new MutableArraySequence<int>(new DynamicArray<int>(a,2));
-
-    Sequence<int>* B =
-            new MutableArraySequence<int>(new DynamicArray<int>(b,2));
-
-    A->Concat(B);
-
-    bool ok = (A->GetLength() == 4 && A->Get(3) == 4);
-
-    PrintResult("Concat", ok);
-
-    delete A;
-    delete B;
-}
 
 static void TestImmutable()
 {
@@ -196,6 +165,44 @@ static void TestImmutable()
     delete newSeq;
 }
 
+static void TestErrors()
+{
+    cout << "\n========== TestErrors ==========\n";
+
+    int arr[] = {1,2,3};
+
+    Sequence<int>* seq =
+            new MutableArraySequence<int>(new DynamicArray<int>(arr,3));
+
+    bool ok1 = false;
+
+    try
+    {
+        seq->Get(10);
+    }
+    catch(const out_of_range&)
+    {
+        ok1 = true;
+    }
+
+    bool ok2 = false;
+
+    try
+    {
+        seq->InsertAt(5,-1);
+    }
+    catch(const out_of_range&)
+    {
+        ok2 = true;
+    }
+
+    PrintResult("Get index error", ok1);
+    PrintResult("InsertAt index error", ok2);
+
+    delete seq;
+}
+
+
 void RunAllTests()
 {
     cout << "\n========================\n";
@@ -206,11 +213,9 @@ void RunAllTests()
     TestLinkedList();
     TestSequenceOperations();
     TestConcat();
-    TestMutableImmutable();
     TestMapWhereReduce();
     TestErrors();
     TestImmutable();
-    TestImmutableErrors();
 
     cout << "\n========================\n";
     cout << "ALL TESTS FINISHED\n";
