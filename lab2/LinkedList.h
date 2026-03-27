@@ -224,15 +224,22 @@ void LinkedList<T>::InsertAt(T item, int index) {
 
 template<class T>
 LinkedList<T>* LinkedList<T>::Concat(LinkedList<T>* list) {
-    LinkedList<T>* newList = new LinkedList<T>(*this);
-    Node<T>* currIt = list->head;
-
-    while (currIt != nullptr) {
-        newList->Append(currIt->data);
-        currIt = currIt->next;
+    if (list->head == nullptr) {
+        return this;
     }
 
-    return newList;
+    if (this->head == nullptr) {
+        this->head = list->head;
+        this->tail = list->tail;
+        this->size = list->size;
+        return this;
+    }
+
+    this->tail->next = list->head;
+    this->tail = list->tail;
+    this->size += list->size;
+
+    return this;
 }
 
 template<class T>

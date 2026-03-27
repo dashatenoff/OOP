@@ -15,8 +15,13 @@ public:
     virtual Sequence<T>* Append(T item) = 0;
     virtual Sequence<T>*Prepend(T item) = 0;
     virtual Sequence<T>*InsertAt(T item, int index) = 0;
-    virtual Sequence <T>* Concat(Sequence <T> *list) = 0;
+    virtual Sequence<T>* Concat(Sequence <T> *list) = 0;
     virtual ~Sequence() = default;
+
+    virtual Sequence<T>* Map(T (*func)(T)) = 0;
+    virtual Sequence<T>* Where(bool (*func)(T)) = 0;
+    virtual T Reduce(T (*func)(T, T), T start) = 0;
+
 };
 
 #endif //UNTITLED2_SEQUENCE_H

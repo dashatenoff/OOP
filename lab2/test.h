@@ -1,8 +1,6 @@
-//
-// Created by dasha on 16/03/2026.
-//
+#ifndef TESTS_H
+#define TESTS_H
 
-#ifndef UNTITLED2_TEST_H
-#define UNTITLED2_TEST_H
+void RunAllTests();
 
-#endif //UNTITLED2_TEST_H
+#endif
