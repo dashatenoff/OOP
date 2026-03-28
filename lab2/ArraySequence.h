@@ -1,17 +1,19 @@
-#include <stdexcept>
-#include "DynamicArray.h"
-#include "Sequence.h"
-
 #ifndef UNTITLED2_ARRAYSEQUENCE_H
 #define UNTITLED2_ARRAYSEQUENCE_H
+
+#include <stdexcept>
+
+#include "DynamicArray.h"
+#include "Sequence.h"
 
 template<class T>
 class MutableArraySequence;
 
-template <class T>
+template<class T>
 class ArraySequence : public Sequence<T> {
 protected:
     DynamicArray<T>* items;
+
     virtual ArraySequence<T>* Instance() = 0;
     virtual ArraySequence<T>* Clone() const = 0;
 
@@ -32,23 +34,24 @@ public:
         return items->Get(index);
     }
 
+    int GetLength() const override {
+        return items->GetSize();
+    }
+
     Sequence<T>* GetSubsequence(int startIndex, int endIndex) override {
         if (startIndex < 0 || endIndex >= GetLength() || startIndex > endIndex) {
             throw std::out_of_range("IndexOutOfRange");
         }
 
         int newSize = endIndex - startIndex + 1;
-        DynamicArray<T>* newDynamicArray = new DynamicArray<T>(newSize);
+
+        DynamicArray<T>* newArr = new DynamicArray<T>(newSize);
 
         for (int i = 0; i < newSize; i++) {
-            newDynamicArray->Set(i, items->Get(startIndex + i));
+            newArr->Set(i, items->Get(startIndex + i));
         }
 
-        return new MutableArraySequence<T>(newDynamicArray);
-    }
-
-    int GetLength() const override {
-        return items->GetSize();
+        return new MutableArraySequence<T>(newArr);
     }
 
 protected:
@@ -61,6 +64,7 @@ protected:
 
     Sequence<T>* PrependImpl(T item) {
         int oldSize = items->GetSize();
+
         items->Resize(oldSize + 1);
 
         for (int i = oldSize - 1; i >= 0; i--) {
@@ -68,6 +72,7 @@ protected:
         }
 
         items->Set(0, item);
+
         return this;
     }
 
@@ -77,6 +82,7 @@ protected:
         }
 
         int oldSize = items->GetSize();
+
         items->Resize(oldSize + 1);
 
         for (int i = oldSize - 1; i >= index; i--) {
@@ -84,6 +90,7 @@ protected:
         }
 
         items->Set(index, item);
+
         return this;
     }
 
@@ -118,24 +125,24 @@ public:
         return Instance()->ConcatImpl(list);
     }
 
-    ~ArraySequence() {
-        delete items;
-    }
-
     Sequence<T>* Map(T (*func)(T)) override {
-        Sequence<T>* result = new MutableArraySequence<T>(new DynamicArray<T>(0));
+        Sequence<T>* result =
+                new MutableArraySequence<T>(new DynamicArray<T>(0));
 
-        for (int i=0; i<this->GetLength(); i++) {
-            result->Append(func(this->Get(i)));
+        for (int i = 0; i < GetLength(); i++) {
+            result->Append(func(Get(i)));
         }
+
         return result;
     }
 
     Sequence<T>* Where(bool (*func)(T)) override {
-        Sequence<T>* result = new MutableArraySequence<T>(new DynamicArray<T>(0));
+        Sequence<T>* result =
+                new MutableArraySequence<T>(new DynamicArray<T>(0));
 
-        for (int i = 0; i < this->GetLength(); i++) {
-            T value = this->Get(i);
+        for (int i = 0; i < GetLength(); i++) {
+            T value = Get(i);
+
             if (func(value)) {
                 result->Append(value);
             }
@@ -147,12 +154,16 @@ public:
     T Reduce(T (*func)(T, T), T start) override {
         T result = start;
 
-        for (int i = 0; i < this->GetLength(); i++) {
-            result = func(this->Get(i), result);
+        for (int i = 0; i < GetLength(); i++) {
+            result = func(Get(i), result);
         }
 
         return result;
     }
+
+    ~ArraySequence() {
+        delete items;
+    }
 };
 
-#endif //UNTITLED2_ARRAYSEQUENCE_H
+#endif

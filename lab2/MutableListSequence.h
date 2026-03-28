@@ -1,6 +1,7 @@
 #ifndef UNTITLED2_MUTABLELISTSEQUENCE_H
 #define UNTITLED2_MUTABLELISTSEQUENCE_H
 
+#include "LinkedList.h"
 #include "ListSequence.h"
 
 template<class T>
@@ -22,4 +23,5 @@ protected:
         );
     }
 };
+
 #endif

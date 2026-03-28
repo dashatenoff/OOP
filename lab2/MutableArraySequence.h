@@ -1,6 +1,5 @@
-
-#ifndef LAB2_MUTABLEARRAYSEQUENCE_H
-#define LAB2_MUTABLEARRAYSEQUENCE_H
+#ifndef UNTITLED2_MUTABLEARRAYSEQUENCE_H
+#define UNTITLED2_MUTABLEARRAYSEQUENCE_H
 
 #include "ArraySequence.h"
 
@@ -24,4 +23,4 @@ protected:
     }
 };
 
-#endif //LAB2_MUTABLEARRAYSEQUENCE_H
+#endif

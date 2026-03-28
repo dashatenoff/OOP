@@ -1,20 +1,26 @@
+#ifndef UNTITLED2_IMMUTABLEARRAYSEQUENCE_H
+#define UNTITLED2_IMMUTABLEARRAYSEQUENCE_H
 
-#ifndef LAB2_IMMUTABLEARRAYSEQUENCE_H
-#define LAB2_IMMUTABLEARRAYSEQUENCE_H
+#include "ArraySequence.h"
 
-template <class T>
+template<class T>
 class ImmutableArraySequence : public ArraySequence<T>{
 public:
-    using ArraySequence<T>::ArraySequence;
+
+    ImmutableArraySequence(DynamicArray<T>* arr)
+            : ArraySequence<T>(arr) {}
 
 protected:
-    Sequence<T>* Clone() const override {
-        return new ImmutableArraySequence<T>(*this);
+
+    ArraySequence<T>* Instance() override {
+        return Clone();
     }
 
-    Sequence<T>* Instance() override {
-        return this->Clone();
+    ArraySequence<T>* Clone() const override {
+        return new ImmutableArraySequence<T>(
+                new DynamicArray<T>(*this->items)
+        );
     }
 };
 
-#endif //LAB2_IMMUTABLEARRAYSEQUENCE_H
+#endif

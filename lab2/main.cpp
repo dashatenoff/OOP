@@ -7,9 +7,9 @@
 
 using namespace std;
 
-int plus1(int x) { return x + 1; }
-bool isEven(int x) { return x % 2 == 0; }
-int sum(int a, int b) { return a + b; }
+static int plus1(int x) { return x + 1; }
+static bool isEven(int x) { return x % 2 == 0; }
+static int sum(int a, int b) { return a + b; }
 
 void printSequence(Sequence<int>* seq){
     for (int i = 0; i < seq->GetLength(); i++){

@@ -7,10 +7,11 @@
 template<class T>
 class MutableListSequence;
 
-template <class T>
+template<class T>
 class ListSequence : public Sequence<T> {
 protected:
     LinkedList<T>* items;
+
     virtual ListSequence<T>* Instance() = 0;
     virtual ListSequence<T>* Clone() const = 0;
 
@@ -36,7 +37,9 @@ public:
     }
 
     Sequence<T>* GetSubsequence(int startIndex, int endIndex) override {
-        return new MutableListSequence<T>(items->GetSubList(startIndex, endIndex));
+        return new MutableListSequence<T>(
+                items->GetSubList(startIndex, endIndex)
+        );
     }
 
 protected:
@@ -57,13 +60,8 @@ protected:
     }
 
     Sequence<T>* ConcatImpl(Sequence<T>* list) {
-        int oldSize = items->GetSize();
-        int addSize = list->GetLength();
-
-        items->Resize(oldSize + addSize);
-
-        for (int i = 0; i < addSize; i++) {
-            items->Set(oldSize + i, list->Get(i));
+        for (int i = 0; i < list->GetLength(); i++) {
+            items->Append(list->Get(i));
         }
         return this;
     }
@@ -91,7 +89,8 @@ public:
     }
 
     Sequence<T>* Map(T (*func)(T)) override {
-        Sequence<T>* result = new MutableListSequence<T>(new LinkedList<T>());
+        Sequence<T>* result =
+                new MutableListSequence<T>(new LinkedList<T>());
 
         for (int i = 0; i < this->GetLength(); i++) {
             result->Append(func(this->Get(i)));
@@ -101,10 +100,12 @@ public:
     }
 
     Sequence<T>* Where(bool (*func)(T)) override {
-        Sequence<T>* result = new MutableListSequence<T>(new LinkedList<T>());
+        Sequence<T>* result =
+                new MutableListSequence<T>(new LinkedList<T>());
 
         for (int i = 0; i < this->GetLength(); i++) {
             T value = this->Get(i);
+
             if (func(value)) {
                 result->Append(value);
             }
