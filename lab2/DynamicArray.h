@@ -1,5 +1,6 @@
 #include <stdexcept>
 #include <algorithm>
+#include "Enumerator.h"
 #ifndef UNTITLED2_DYNAMICARRAY_H
 #define UNTITLED2_DYNAMICARRAY_H
 
@@ -93,5 +94,6 @@ template<class T>
 DynamicArray<T>::~DynamicArray(){
     delete []data;
 }
+
 
 #endif //UNTITLED2_DYNAMICARRAY_H

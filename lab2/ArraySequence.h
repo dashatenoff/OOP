@@ -2,7 +2,8 @@
 #define UNTITLED2_ARRAYSEQUENCE_H
 
 #include <stdexcept>
-
+#include "Enumerator.h"
+#include "IEnumerator.h"
 #include "DynamicArray.h"
 #include "Sequence.h"
 
@@ -159,6 +160,10 @@ public:
         }
 
         return result;
+    }
+
+    IEnumerator<T>* GetEnumerator() override {
+        return new Enumerator<T>(this);
     }
 
     ~ArraySequence() {

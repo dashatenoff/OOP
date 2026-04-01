@@ -1,4 +1,5 @@
 #include <iostream>
+#include <stdexcept>
 
 #include "DynamicArray.h"
 #include "LinkedList.h"
@@ -20,49 +21,48 @@ int sum(int a, int b) { return a + b; }
 
 static void PrintResult(const char* name, bool ok)
 {
-    cout << name << ": " << (ok ? "OK" : "FAIL") << "\n";
+    cout << name << ": " << (ok ? "OK" : "FAIL") << endl;
 }
 
 static void TestDynamicArray()
 {
-    cout << "\n=== TestDynamicArray ===\n";
+    cout << "\n========== TestDynamicArray ==========\n";
 
     int arr[] = {1,2,3};
-
     DynamicArray<int> da(arr,3);
 
-    bool ok1 = (da.Get(0) == 1);
-    bool ok2 = (da.GetSize() == 3);
+    bool ok;
+
+    ok = (da.Get(0) == 1);
+    PrintResult("Get", ok);
+
+    ok = (da.GetSize() == 3);
+    PrintResult("GetSize", ok);
 
     da.Set(1,10);
-    bool ok3 = (da.Get(1) == 10);
 
-    PrintResult("Get", ok1);
-    PrintResult("GetSize", ok2);
-    PrintResult("Set", ok3);
+    ok = (da.Get(1) == 10);
+    PrintResult("Set", ok);
 }
 
 static void TestLinkedList()
 {
-    cout << "\n=== TestLinkedList ===\n";
+    cout << "\n========== TestLinkedList ==========\n";
 
     int arr[] = {1,2,3};
-
     LinkedList<int> list(arr,3);
 
     list.Append(4);
+    bool ok;
 
-    bool ok1 = (list.GetLast() == 4);
+    ok = (list.GetLast() == 4);
+    PrintResult("Append", ok);
 
     list.Prepend(0);
 
-    bool ok2 = (list.GetFirst() == 0);
-
-    PrintResult("Append", ok1);
-    PrintResult("Prepend", ok2);
+    ok = (list.GetFirst() == 0);
+    PrintResult("Prepend", ok);
 }
-
-
 
 static void TestSequenceOperations()
 {
@@ -73,22 +73,28 @@ static void TestSequenceOperations()
     Sequence<int>* seq =
             new MutableArraySequence<int>(new DynamicArray<int>(arr,3));
 
+    bool ok;
+
     seq->Append(4);
-    bool ok1 = (seq->Get(3) == 4);
+    ok = (seq->Get(3) == 4);
+    PrintResult("Append", ok);
 
     seq->Prepend(0);
-    bool ok2 = (seq->Get(0) == 0);
+    ok = (seq->Get(0) == 0);
+    PrintResult("Prepend", ok);
 
     seq->InsertAt(5,2);
-    bool ok3 = (seq->Get(2) == 5);
+    ok = (seq->Get(2) == 5);
+    PrintResult("InsertAt", ok);
 
     Sequence<int>* sub = seq->GetSubsequence(1,3);
-    bool ok4 = (sub->GetLength() == 3);
 
-    PrintResult("Append", ok1);
-    PrintResult("Prepend", ok2);
-    PrintResult("InsertAt", ok3);
-    PrintResult("GetSubsequence", ok4);
+    ok = (sub->GetLength() == 3 &&
+          sub->Get(0) == 2 &&
+          sub->Get(1) == 5 &&
+          sub->Get(2) == 3);
+
+    PrintResult("GetSubsequence", ok);
 
     delete seq;
     delete sub;
@@ -109,7 +115,12 @@ static void TestConcat()
 
     A->Concat(B);
 
-    bool ok = (A->GetLength() == 4 && A->Get(3) == 4);
+    bool ok =
+            (A->GetLength() == 4 &&
+             A->Get(0) == 1 &&
+             A->Get(1) == 2 &&
+             A->Get(2) == 3 &&
+             A->Get(3) == 4);
 
     PrintResult("Concat", ok);
 
@@ -119,7 +130,7 @@ static void TestConcat()
 
 static void TestMapWhereReduce()
 {
-    cout << "\n=== TestMapWhereReduce ===\n";
+    cout << "\n========== TestMapWhereReduce ==========\n";
 
     int arr[] = {1,2,3,4};
 
@@ -130,19 +141,28 @@ static void TestMapWhereReduce()
     Sequence<int>* filtered = seq->Where(isEven);
     int r = seq->Reduce(sum,0);
 
-    bool ok1 = (mapped->Get(0) == 2);
-    bool ok2 = (filtered->GetLength() == 2);
-    bool ok3 = (r == 10);
+    bool ok;
 
-    PrintResult("Map", ok1);
-    PrintResult("Where", ok2);
-    PrintResult("Reduce", ok3);
+    ok = (mapped->Get(0) == 2 &&
+          mapped->Get(1) == 3 &&
+          mapped->Get(2) == 4 &&
+          mapped->Get(3) == 5);
+
+    PrintResult("Map", ok);
+
+    ok = (filtered->GetLength() == 2 &&
+          filtered->Get(0) == 2 &&
+          filtered->Get(1) == 4);
+
+    PrintResult("Where", ok);
+
+    ok = (r == 10);
+    PrintResult("Reduce", ok);
 
     delete seq;
     delete mapped;
     delete filtered;
 }
-
 
 static void TestImmutable()
 {
@@ -156,7 +176,7 @@ static void TestImmutable()
     Sequence<int>* newSeq = seq->Append(4);
 
     bool ok1 = (seq->GetLength() == 3);
-    bool ok2 = (newSeq->GetLength() == 4);
+    bool ok2 = (newSeq->GetLength() == 4 && newSeq->Get(3) == 4);
 
     PrintResult("Immutable original unchanged", ok1);
     PrintResult("Immutable returns new object", ok2);
@@ -185,6 +205,8 @@ static void TestErrors()
         ok1 = true;
     }
 
+    PrintResult("Get index error", ok1);
+
     bool ok2 = false;
 
     try
@@ -196,12 +218,36 @@ static void TestErrors()
         ok2 = true;
     }
 
-    PrintResult("Get index error", ok1);
     PrintResult("InsertAt index error", ok2);
 
     delete seq;
 }
 
+static void TestEnumerator()
+{
+    cout << "\n========== TestEnumerator ==========\n";
+
+    int arr[] = {1,2,3};
+
+    Sequence<int>* seq =
+            new MutableArraySequence<int>(new DynamicArray<int>(arr,3));
+
+    IEnumerator<int>* it = seq->GetEnumerator();
+
+    int s = 0;
+
+    while(it->MoveNext())
+    {
+        s += it->Current();
+    }
+
+    bool ok = (s == 6);
+
+    PrintResult("Enumerator iteration", ok);
+
+    delete it;
+    delete seq;
+}
 
 void RunAllTests()
 {
@@ -216,9 +262,9 @@ void RunAllTests()
     TestMapWhereReduce();
     TestErrors();
     TestImmutable();
+    TestEnumerator();
 
     cout << "\n========================\n";
     cout << "ALL TESTS FINISHED\n";
     cout << "========================\n";
 }
-

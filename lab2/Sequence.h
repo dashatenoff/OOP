@@ -1,7 +1,7 @@
 
 #ifndef UNTITLED2_SEQUENCE_H
 #define UNTITLED2_SEQUENCE_H
-
+#include "IEnumerator.h"
 
 
 template<class T>
@@ -22,6 +22,7 @@ public:
     virtual Sequence<T>* Where(bool (*func)(T)) = 0;
     virtual T Reduce(T (*func)(T, T), T start) = 0;
 
+    virtual IEnumerator<T>* GetEnumerator() = 0;
 };
 
 #endif //UNTITLED2_SEQUENCE_H

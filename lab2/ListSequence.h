@@ -3,6 +3,8 @@
 
 #include "Sequence.h"
 #include "LinkedList.h"
+#include "Enumerator.h"
+#include "IEnumerator.h"
 
 template<class T>
 class MutableListSequence;
@@ -122,6 +124,10 @@ public:
         }
 
         return result;
+    }
+
+    IEnumerator<T>* GetEnumerator() override {
+        return new Enumerator<T>(this);
     }
 };
 
