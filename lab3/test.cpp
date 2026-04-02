@@ -170,8 +170,7 @@ static void TestImmutable()
 
     int arr[] = {1,2,3};
 
-    Sequence<int>* seq =
-            new ImmutableArraySequence<int>(new DynamicArray<int>(arr,3));
+    Sequence<int>* seq = new ImmutableArraySequence<int>(new DynamicArray<int>(arr,3));
 
     Sequence<int>* newSeq = seq->Append(4);
 
@@ -191,8 +190,7 @@ static void TestErrors()
 
     int arr[] = {1,2,3};
 
-    Sequence<int>* seq =
-            new MutableArraySequence<int>(new DynamicArray<int>(arr,3));
+    Sequence<int>* seq = new MutableArraySequence<int>(new DynamicArray<int>(arr,3));
 
     bool ok1 = false;
 

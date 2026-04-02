@@ -7,8 +7,7 @@ template<class T>
 class ImmutableArraySequence : public ArraySequence<T>{
 public:
 
-    ImmutableArraySequence(DynamicArray<T>* arr)
-            : ArraySequence<T>(arr) {}
+    ImmutableArraySequence(DynamicArray<T>* arr) : ArraySequence<T>(arr) {}
 
 protected:
 
