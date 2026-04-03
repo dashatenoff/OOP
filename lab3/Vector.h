@@ -5,15 +5,21 @@
 #include "MutableArraySequence.h"
 #include <cmath>
 #include <iostream>
+#include <stdexcept>
+#include <cassert>
 
 template<class T>
 class Vector {
 private:
     Sequence<T> *data;
-    0
+
 public:
     Vector() {
         data = new MutableArraySequence<T>(new DynamicArray<T>(0));
+    }
+
+    Vector(Sequence<T>* seq) {
+        data = seq;
     }
 
     ~Vector() {
@@ -25,7 +31,31 @@ public:
     }
 
     void PushBack(T value) {
-        data->Append(value);
+        Sequence<T>* newData = data->Append(value);
+        if (newData != data)
+            delete data;
+        data = newData;
+    }
+
+    void PushFront(T value) {
+        Sequence<T>* newData = data->Prepend(value);
+        if (newData != data)
+            delete data;
+        data = newData;
+    }
+
+    void InsertAt(T value, int index) {
+        Sequence<T>* newData = data->InsertAt(value, index);
+        if (newData != data)
+            delete data;
+        data = newData;
+    }
+
+    void Concat(Vector<T>* other) {
+        Sequence<T>* newData = data->Concat(other->data);
+        if (newData != data)
+            delete data;
+        data = newData;
     }
 
     void PopBack() {
@@ -47,7 +77,7 @@ public:
     }
 
 
-    T Get(int index) {
+    T Get(int index) const {
         return data->Get(index);
     }
 
@@ -65,10 +95,10 @@ public:
             newData = data->GetSubsequence(0, index - 1);
         }
 
-        newData->Append(value);
+        newData = newData->Append(value);
 
         if (index + 1 < size) {
-            newData->Concat(data->GetSubsequence(index + 1, size - 1));
+            newData = newData->Concat(data->GetSubsequence(index + 1, size - 1));
         }
 
         delete data;
@@ -123,7 +153,7 @@ public:
             sum += (*this)[i] * (*this)[i];
         }
 
-        return sqrt(sum);
+        return std::sqrt(sum);
     }
 
     friend std::ostream &operator<<(std::ostream &os, const Vector<T> &v) {
@@ -139,6 +169,57 @@ public:
         os << "]";
         return os;
     }
+
+    Vector<T>* Map(T (*func)(T)) const {
+        Sequence<T>* newData = data->Map(func);
+        return new Vector<T>(newData);
+    }
+
+    Vector<T>* Where(bool (*func)(T)) const {
+        Sequence<T>* newData = data->Where(func);
+        return new Vector<T>(newData);
+    }
+
+    T Reduce(T (*func)(T, T), T start) const {
+        return data->Reduce(func,start);
+    }
+
+    IEnumerator<T>* GetEnumerator() const {
+        return data->GetEnumerator();
+    }
+
+    static Vector<int>* Range(int l, int r){
+        if (l > r)
+            throw std::invalid_argument("Invalid range");
+
+        Vector<int>* v = new Vector<int>();
+
+        for (int i=l; i<=r; i++){
+            v->PushBack(i);
+        }
+
+        return v;
+    }
+
+    static bool IsPrime(int x) {
+        if (x<2) return false;
+
+        for (int i=2; i*i <= x; i++){
+            if (x%i == 0)
+                return false;
+        }
+
+        return true;
+    }
+
+    static Vector<int>* PrimeNumbers(int l, int r) {
+        Vector<int>* numbers = Range(l, r);
+        Vector<int>* primes = numbers->Where(IsPrime);
+
+        delete numbers;
+        return primes;
+    }
+
 };
 
 #endif //LAB2_VECTOR_H
