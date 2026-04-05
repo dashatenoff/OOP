@@ -11,6 +11,9 @@ template<class T>
 class MutableArraySequence;
 
 template<class T>
+class ImmutableArraySequence;
+
+template<class T>
 class ArraySequence : public Sequence<T> {
 protected:
     DynamicArray<T>* items;

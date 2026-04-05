@@ -1,6 +1,8 @@
 #ifndef LAB2_ENUMERATOR_H
 #define LAB2_ENUMERATOR_H
+
 #include <stdexcept>
+
 #include "Sequence.h"
 #include "IEnumerator.h"
 
