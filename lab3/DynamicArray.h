@@ -1,8 +1,8 @@
-#include <stdexcept>
-#include <algorithm>
-#include "Enumerator.h"
 #ifndef UNTITLED2_DYNAMICARRAY_H
 #define UNTITLED2_DYNAMICARRAY_H
+
+#include <stdexcept>
+#include <algorithm>
 
 template <class T>
 class DynamicArray{

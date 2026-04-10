@@ -19,7 +19,6 @@ add_executable(lab2
         MutableListSequence.h
         ImmutableListSequence.h
 
-        Enumerator.h
         IEnumerator.h
 
         Vector.h

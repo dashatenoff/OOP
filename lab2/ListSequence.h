@@ -3,7 +3,6 @@
 
 #include "Sequence.h"
 #include "LinkedList.h"
-#include "Enumerator.h"
 #include "IEnumerator.h"
 #include "ListEnumerator.h"
 
