@@ -11,12 +11,12 @@ private:
     int size;
 
 public:
-    DynamicArray(T* items, int count);
+    DynamicArray(const T* items, int count);
     DynamicArray(int size);
     DynamicArray(const DynamicArray<T> & dynamicArray);
     T Get(int index) const;
     int GetSize() const;
-    void Set(int index, T value);
+    void Set(int index, const T& value);
     void Resize(int newSize);
     ~DynamicArray();
 };
@@ -35,7 +35,7 @@ int DynamicArray<T>::GetSize() const {
 }
 
 template<class T>
-void DynamicArray<T>::Set(int index, T value) {
+void DynamicArray<T>::Set(int index, const T& value) {
     if (index<0 || index >= size) {
         throw std::out_of_range("Index out of range");
     }
@@ -58,7 +58,7 @@ void DynamicArray<T>::Resize(int newSize){
 }
 
 template<class T>
-DynamicArray<T>::DynamicArray(T* items, int count){
+DynamicArray<T>::DynamicArray(const T* items, int count){
     if (count < 0) {
         throw std::invalid_argument("Count cannot be negative");
     }
@@ -95,5 +95,4 @@ DynamicArray<T>::~DynamicArray(){
     delete []data;
 }
 
-
-#endif //UNTITLED2_DYNAMICARRAY_H
+#endif

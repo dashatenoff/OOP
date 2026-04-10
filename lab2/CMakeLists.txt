@@ -19,6 +19,7 @@ add_executable(lab2
         MutableListSequence.h
         ImmutableListSequence.h
 
-        Enumerator.h
+        ArrayEnumerator.h
+        ListEnumerator.h
         IEnumerator.h
 )

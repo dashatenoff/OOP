@@ -30,28 +30,28 @@ public:
         return data->GetLength();
     }
 
-    void PushBack(T value) {
+    void PushBack(const T& value) {
         Sequence<T>* newData = data->Append(value);
         if (newData != data)
             delete data;
         data = newData;
     }
 
-    void PushFront(T value) {
+    void PushFront(const T& value) {
         Sequence<T>* newData = data->Prepend(value);
         if (newData != data)
             delete data;
         data = newData;
     }
 
-    void InsertAt(T value, int index) {
+    void InsertAt(const T& value, int index) {
         Sequence<T>* newData = data->InsertAt(value, index);
         if (newData != data)
             delete data;
         data = newData;
     }
 
-    void Concat(Vector<T>* other) {
+    void Concat(const Vector<T>* other) {
         Sequence<T>* newData = data->Concat(other->data);
         if (newData != data)
             delete data;
@@ -76,12 +76,11 @@ public:
         data = newData;
     }
 
-
     T Get(int index) const {
         return data->Get(index);
     }
 
-    void Set(int index, T value) {
+    void Set(int index, const T& value) {
         int size = data->GetLength();
 
         if (index < 0 || index >= size)
@@ -115,21 +114,21 @@ public:
             throw std::invalid_argument("Vector sizes must match");
 
         Vector<T> result;
-        int size = data->GetLength();
 
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < Size(); i++) {
             result.PushBack((*this)[i] + other[i]);
         }
 
         return result;
     }
 
-    Vector<T> operator*(T scalar) const {
+    Vector<T> operator*(const T& scalar) const {
         Vector<T> result;
 
         for (int i = 0; i < Size(); i++) {
             result.PushBack((*this)[i] * scalar);
         }
+
         return result;
     }
 
@@ -170,17 +169,17 @@ public:
         return os;
     }
 
-    Vector<T>* Map(T (*func)(T)) const {
+    Vector<T>* Map(T (*func)(const T&)) const {
         Sequence<T>* newData = data->Map(func);
         return new Vector<T>(newData);
     }
 
-    Vector<T>* Where(bool (*func)(T)) const {
+    Vector<T>* Where(bool (*func)(const T&)) const {
         Sequence<T>* newData = data->Where(func);
         return new Vector<T>(newData);
     }
 
-    T Reduce(T (*func)(T, T), T start) const {
+    T Reduce(T (*func)(const T&, const T&), const T& start) const {
         return data->Reduce(func,start);
     }
 
@@ -222,4 +221,4 @@ public:
 
 };
 
-#endif //LAB2_VECTOR_H
+#endif

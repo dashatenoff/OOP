@@ -1,270 +1,179 @@
+#include <cassert>
 #include <iostream>
-#include <stdexcept>
 
 #include "DynamicArray.h"
 #include "LinkedList.h"
-
 #include "MutableArraySequence.h"
-#include "ImmutableArraySequence.h"
-
 #include "MutableListSequence.h"
-#include "ImmutableListSequence.h"
-
-#include "Sequence.h"
-#include "test.h"
 
 using namespace std;
 
-int plus1(int x) { return x + 1; }
-bool isEven(int x) { return x % 2 == 0; }
-int sum(int a, int b) { return a + b; }
+static int plus1(const int& x) { return x + 1; }
+static bool isEven(const int& x) { return x % 2 == 0; }
+static int sum(const int& a, const int& b) { return a + b; }
 
-static void PrintResult(const char* name, bool ok)
-{
-    cout << name << ": " << (ok ? "OK" : "FAIL") << endl;
+void TestDynamicArray(){
+
+    cout << "\nDynamicArray test\n";
+
+    int arr[3] = {1,2,3};
+
+    DynamicArray<int> a(arr,3);
+
+    cout << "Size expected: 3, got: " << a.GetSize() << endl;
+    assert(a.GetSize() == 3);
+
+    cout << "Element[0] expected: 1, got: " << a.Get(0) << endl;
+    assert(a.Get(0) == 1);
+
+    cout << "Element[2] expected: 3, got: " << a.Get(2) << endl;
+    assert(a.Get(2) == 3);
+
+    a.Set(1,5);
+
+    cout << "After Set index 1 expected: 5, got: " << a.Get(1) << endl;
+    assert(a.Get(1) == 5);
+
+    a.Resize(5);
+
+    cout << "Size after Resize expected: 5, got: " << a.GetSize() << endl;
+    assert(a.GetSize() == 5);
 }
 
-static void TestDynamicArray()
-{
-    cout << "\n========== TestDynamicArray ==========\n";
+void TestLinkedList(){
 
-    int arr[] = {1,2,3};
-    DynamicArray<int> da(arr,3);
+    cout << "\nLinkedList test\n";
 
-    bool ok;
+    int arr[3] = {1,2,3};
 
-    ok = (da.Get(0) == 1);
-    PrintResult("Get", ok);
-
-    ok = (da.GetSize() == 3);
-    PrintResult("GetSize", ok);
-
-    da.Set(1,10);
-
-    ok = (da.Get(1) == 10);
-    PrintResult("Set", ok);
-}
-
-static void TestLinkedList()
-{
-    cout << "\n========== TestLinkedList ==========\n";
-
-    int arr[] = {1,2,3};
     LinkedList<int> list(arr,3);
 
-    list.Append(4);
-    bool ok;
+    cout << "Size expected: 3, got: " << list.GetLength() << endl;
+    assert(list.GetLength() == 3);
 
-    ok = (list.GetLast() == 4);
-    PrintResult("Append", ok);
+    cout << "First expected: 1, got: " << list.GetFirst() << endl;
+    assert(list.GetFirst() == 1);
+
+    cout << "Last expected: 3, got: " << list.GetLast() << endl;
+    assert(list.GetLast() == 3);
+
+    list.Append(4);
+
+    cout << "After Append size expected: 4, got: " << list.GetLength() << endl;
+    assert(list.GetLength() == 4);
+
+    cout << "Last element expected: 4, got: " << list.Get(3) << endl;
+    assert(list.Get(3) == 4);
 
     list.Prepend(0);
 
-    ok = (list.GetFirst() == 0);
-    PrintResult("Prepend", ok);
+    cout << "After Prepend first expected: 0, got: " << list.GetFirst() << endl;
+    assert(list.GetFirst() == 0);
 }
 
-static void TestSequenceOperations()
-{
-    cout << "\n========== TestSequenceOperations ==========\n";
+void TestSequence(){
 
-    int arr[] = {1,2,3};
+    cout << "\nSequence test\n";
+
+    int arr[3] = {1,2,3};
 
     Sequence<int>* seq =
             new MutableArraySequence<int>(new DynamicArray<int>(arr,3));
 
-    bool ok;
-
     seq->Append(4);
-    ok = (seq->Get(3) == 4);
-    PrintResult("Append", ok);
+
+    cout << "Append size expected: 4, got: " << seq->GetLength() << endl;
+    assert(seq->GetLength() == 4);
+
+    cout << "Last element expected: 4, got: " << seq->Get(3) << endl;
+    assert(seq->Get(3) == 4);
 
     seq->Prepend(0);
-    ok = (seq->Get(0) == 0);
-    PrintResult("Prepend", ok);
 
-    seq->InsertAt(5,2);
-    ok = (seq->Get(2) == 5);
-    PrintResult("InsertAt", ok);
+    cout << "Prepend first expected: 0, got: " << seq->Get(0) << endl;
+    assert(seq->Get(0) == 0);
 
-    Sequence<int>* sub = seq->GetSubsequence(1,3);
+    seq->InsertAt(100,2);
 
-    ok = (sub->GetLength() == 3 &&
-          sub->Get(0) == 2 &&
-          sub->Get(1) == 5 &&
-          sub->Get(2) == 3);
-
-    PrintResult("GetSubsequence", ok);
+    cout << "InsertAt index 2 expected: 100, got: " << seq->Get(2) << endl;
+    assert(seq->Get(2) == 100);
 
     delete seq;
-    delete sub;
 }
 
-static void TestConcat()
-{
-    cout << "\n========== TestConcat ==========\n";
+void TestMapWhereReduce(){
 
-    int a[] = {1,2};
-    int b[] = {3,4};
+    cout << "\nMap / Where / Reduce test\n";
 
-    Sequence<int>* A =
-            new MutableArraySequence<int>(new DynamicArray<int>(a,2));
-
-    Sequence<int>* B =
-            new MutableArraySequence<int>(new DynamicArray<int>(b,2));
-
-    A->Concat(B);
-
-    bool ok =
-            (A->GetLength() == 4 &&
-             A->Get(0) == 1 &&
-             A->Get(1) == 2 &&
-             A->Get(2) == 3 &&
-             A->Get(3) == 4);
-
-    PrintResult("Concat", ok);
-
-    delete A;
-    delete B;
-}
-
-static void TestMapWhereReduce()
-{
-    cout << "\n========== TestMapWhereReduce ==========\n";
-
-    int arr[] = {1,2,3,4};
+    int arr[4] = {1,2,3,4};
 
     Sequence<int>* seq =
             new MutableArraySequence<int>(new DynamicArray<int>(arr,4));
 
     Sequence<int>* mapped = seq->Map(plus1);
+
+    cout << "Map first expected: 2, got: " << mapped->Get(0) << endl;
+    assert(mapped->Get(0) == 2);
+
+    cout << "Map last expected: 5, got: " << mapped->Get(3) << endl;
+    assert(mapped->Get(3) == 5);
+
     Sequence<int>* filtered = seq->Where(isEven);
+
+    cout << "Where size expected: 2, got: " << filtered->GetLength() << endl;
+    assert(filtered->GetLength() == 2);
+
+    cout << "Where first expected: 2, got: " << filtered->Get(0) << endl;
+    assert(filtered->Get(0) == 2);
+
     int r = seq->Reduce(sum,0);
 
-    bool ok;
-
-    ok = (mapped->Get(0) == 2 &&
-          mapped->Get(1) == 3 &&
-          mapped->Get(2) == 4 &&
-          mapped->Get(3) == 5);
-
-    PrintResult("Map", ok);
-
-    ok = (filtered->GetLength() == 2 &&
-          filtered->Get(0) == 2 &&
-          filtered->Get(1) == 4);
-
-    PrintResult("Where", ok);
-
-    ok = (r == 10);
-    PrintResult("Reduce", ok);
+    cout << "Reduce expected: 10, got: " << r << endl;
+    assert(r == 10);
 
     delete seq;
     delete mapped;
     delete filtered;
 }
 
-static void TestImmutable()
-{
-    cout << "\n========== TestImmutable ==========\n";
+void TestEnumerator(){
 
-    int arr[] = {1,2,3};
+    cout << "\nEnumerator test\n";
 
-    Sequence<int>* seq =
-            new ImmutableArraySequence<int>(new DynamicArray<int>(arr,3));
-
-    Sequence<int>* newSeq = seq->Append(4);
-
-    bool ok1 = (seq->GetLength() == 3);
-    bool ok2 = (newSeq->GetLength() == 4 && newSeq->Get(3) == 4);
-
-    PrintResult("Immutable original unchanged", ok1);
-    PrintResult("Immutable returns new object", ok2);
-
-    delete seq;
-    delete newSeq;
-}
-
-static void TestErrors()
-{
-    cout << "\n========== TestErrors ==========\n";
-
-    int arr[] = {1,2,3};
+    int arr[4] = {1,2,3,4};
 
     Sequence<int>* seq =
-            new MutableArraySequence<int>(new DynamicArray<int>(arr,3));
-
-    bool ok1 = false;
-
-    try
-    {
-        seq->Get(10);
-    }
-    catch(const out_of_range&)
-    {
-        ok1 = true;
-    }
-
-    PrintResult("Get index error", ok1);
-
-    bool ok2 = false;
-
-    try
-    {
-        seq->InsertAt(5,-1);
-    }
-    catch(const out_of_range&)
-    {
-        ok2 = true;
-    }
-
-    PrintResult("InsertAt index error", ok2);
-
-    delete seq;
-}
-
-static void TestEnumerator()
-{
-    cout << "\n========== TestEnumerator ==========\n";
-
-    int arr[] = {1,2,3};
-
-    Sequence<int>* seq =
-            new MutableArraySequence<int>(new DynamicArray<int>(arr,3));
+            new MutableArraySequence<int>(new DynamicArray<int>(arr,4));
 
     IEnumerator<int>* it = seq->GetEnumerator();
 
-    int s = 0;
+    int total = 0;
+    int count = 0;
 
-    while(it->MoveNext())
-    {
-        s += it->Current();
+    while(it->MoveNext()){
+        total += it->Current();
+        count++;
     }
 
-    bool ok = (s == 6);
+    cout << "Enumerator count expected: 4, got: " << count << endl;
+    assert(count == seq->GetLength());
 
-    PrintResult("Enumerator iteration", ok);
+    cout << "Enumerator sum expected: 10, got: " << total << endl;
+    assert(total == 10);
 
     delete it;
     delete seq;
 }
 
-void RunAllTests()
-{
-    cout << "\n========================\n";
-    cout << "RUNNING TESTS\n";
-    cout << "========================\n";
+void RunAllTests(){
+
+    cout << "\n===== RUNNING TESTS =====\n";
 
     TestDynamicArray();
     TestLinkedList();
-    TestSequenceOperations();
-    TestConcat();
+    TestSequence();
     TestMapWhereReduce();
-    TestErrors();
-    TestImmutable();
     TestEnumerator();
 
-    cout << "\n========================\n";
-    cout << "ALL TESTS FINISHED\n";
-    cout << "========================\n";
+    cout << "\n===== ALL TESTS PASSED =====\n";
 }

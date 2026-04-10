@@ -6,6 +6,7 @@
 #include "IEnumerator.h"
 #include "DynamicArray.h"
 #include "Sequence.h"
+#include "ArrayEnumerator.h"
 
 template<class T>
 class MutableArraySequence;
@@ -57,13 +58,13 @@ public:
 
 protected:
 
-    Sequence<T>* AppendImpl(T item) {
+    Sequence<T>* AppendImpl(const T& item) {
         items->Resize(items->GetSize() + 1);
         items->Set(items->GetSize() - 1, item);
         return this;
     }
 
-    Sequence<T>* PrependImpl(T item) {
+    Sequence<T>* PrependImpl(const T& item) {
         int oldSize = items->GetSize();
 
         items->Resize(oldSize + 1);
@@ -77,7 +78,7 @@ protected:
         return this;
     }
 
-    Sequence<T>* InsertAtImpl(T item, int index) {
+    Sequence<T>* InsertAtImpl(const T& item, int index) {
         if (index < 0 || index > items->GetSize()) {
             throw std::out_of_range("IndexOutOfRange");
         }
@@ -95,7 +96,7 @@ protected:
         return this;
     }
 
-    Sequence<T>* ConcatImpl(Sequence<T>* list) {
+    Sequence<T>* ConcatImpl(const Sequence<T>* list) {
         int oldSize = items->GetSize();
         int addSize = list->GetLength();
 
@@ -110,23 +111,23 @@ protected:
 
 public:
 
-    Sequence<T>* Append(T item) override {
+    Sequence<T>* Append(const T& item) override {
         return Instance()->AppendImpl(item);
     }
 
-    Sequence<T>* Prepend(T item) override {
+    Sequence<T>* Prepend(const T& item) override {
         return Instance()->PrependImpl(item);
     }
 
-    Sequence<T>* InsertAt(T item, int index) override {
+    Sequence<T>* InsertAt(const T& item, int index) override {
         return Instance()->InsertAtImpl(item, index);
     }
 
-    Sequence<T>* Concat(Sequence<T>* list) override {
+    Sequence<T>* Concat(const Sequence<T>* list) override {
         return Instance()->ConcatImpl(list);
     }
 
-    Sequence<T>* Map(T (*func)(T)) override {
+    Sequence<T>* Map(T (*func)(const T&)) override {
         Sequence<T>* result =
                 new MutableArraySequence<T>(new DynamicArray<T>(0));
 
@@ -137,7 +138,7 @@ public:
         return result;
     }
 
-    Sequence<T>* Where(bool (*func)(T)) override {
+    Sequence<T>* Where(bool (*func)(const T&)) override {
         Sequence<T>* result =
                 new MutableArraySequence<T>(new DynamicArray<T>(0));
 
@@ -148,11 +149,10 @@ public:
                 result->Append(value);
             }
         }
-
         return result;
     }
 
-    T Reduce(T (*func)(T, T), T start) override {
+    T Reduce(T (*func)(const T&, const T&), const T& start) override {
         T result = start;
 
         for (int i = 0; i < GetLength(); i++) {
@@ -163,7 +163,7 @@ public:
     }
 
     IEnumerator<T>* GetEnumerator() override {
-        return new Enumerator<T>(this);
+        return new ArrayEnumerator<T>(items);
     }
 
     ~ArraySequence() {

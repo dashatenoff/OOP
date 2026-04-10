@@ -17,7 +17,7 @@ private:
     int size;
 
 public:
-    LinkedList(T* items, int count);
+    LinkedList(const T* items, int count);
     LinkedList();
     LinkedList(const LinkedList<T>& list);
 
@@ -29,17 +29,21 @@ public:
 
     int GetLength() const;
 
-    void Append(T item);
-    void Prepend(T item);
-    void InsertAt(T item, int index);
+    void Append(const T& item);
+    void Prepend(const T& item);
+    void InsertAt(const T& item, int index);
 
-    LinkedList<T>* Concat(LinkedList<T>* list);
+    LinkedList<T>* Concat(const LinkedList<T>* list);
+
+    Node<T>* GetHead() const {
+        return head;
+    }
 
     ~LinkedList();
 };
 
 template<class T>
-LinkedList<T>::LinkedList(T* items, int count){
+LinkedList<T>::LinkedList(const T* items, int count){
     if (count < 0){
         throw std::invalid_argument("Count cannot be negative");
     }
@@ -172,7 +176,7 @@ int LinkedList<T>::GetLength() const{
 }
 
 template<class T>
-void LinkedList<T>::Append(T item){
+void LinkedList<T>::Append(const T& item){
     Node<T>* newNode = new Node<T>;
     newNode->data = item;
     newNode->next = nullptr;
@@ -190,7 +194,7 @@ void LinkedList<T>::Append(T item){
 }
 
 template<class T>
-void LinkedList<T>::Prepend(T item){
+void LinkedList<T>::Prepend(const T& item){
     Node<T>* newNode = new Node<T>;
     newNode->data = item;
     newNode->next = head;
@@ -205,7 +209,7 @@ void LinkedList<T>::Prepend(T item){
 }
 
 template<class T>
-void LinkedList<T>::InsertAt(T item, int index){
+void LinkedList<T>::InsertAt(const T& item, int index){
     if (index < 0 || index > size){
         throw std::out_of_range("IndexOutOfRange");
     }
@@ -236,7 +240,7 @@ void LinkedList<T>::InsertAt(T item, int index){
 }
 
 template<class T>
-LinkedList<T>* LinkedList<T>::Concat(LinkedList<T>* list){
+LinkedList<T>* LinkedList<T>::Concat(const LinkedList<T>* list){
     Node<T>* curr = list->head;
 
     while (curr != nullptr){
@@ -260,6 +264,7 @@ LinkedList<T>::~LinkedList(){
     head = nullptr;
     tail = nullptr;
     size = 0;
+
 }
 
 #endif
