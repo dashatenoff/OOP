@@ -1,0 +1,6 @@
+# ninja log v6
+26	210	7960798943446886	CMakeFiles/project.dir/field_info.c.obj	53759ee6ad5d5adf
+242	409	7960798945615295	project.exe	3d0ced8ec88c9383
+19	222	7960798943382177	CMakeFiles/project.dir/matrix.c.obj	9e7b7e7fb20fd9e8
+11	216	7960798943302067	CMakeFiles/project.dir/main.c.obj	14c8b3475e592ad7
+33	241	7960798943512029	CMakeFiles/project.dir/tests.c.obj	debbe360199d3f7d
