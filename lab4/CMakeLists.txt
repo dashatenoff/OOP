@@ -3,7 +3,7 @@ project(lab4)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(lab2
+add_executable(lab4
         main.cpp
         test.cpp
 
@@ -22,4 +22,15 @@ add_executable(lab2
         ArrayEnumerator.h
         ListEnumerator.h
         IEnumerator.h
+
+        Cardinal.h
+        Generator.h
+        Operation.h
+        LazySequence.h
+
+        ReadOnlyStream.h
+        WriteOnlyStream.h
+        Rule.h
+        Tape.h
+        TuringMachine.h
 )

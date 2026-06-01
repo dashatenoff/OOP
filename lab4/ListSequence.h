@@ -22,20 +22,24 @@ public:
         items = list;
     }
 
-    T GetFirst() const override {
+    T GetFirst() override {
         return items->GetFirst();
     }
 
-    T GetLast() const override {
+    T GetLast() override {
         return items->GetLast();
     }
 
-    T Get(int index) const override {
+    T Get(int index) override {
         return items->Get(index);
     }
 
-    int GetLength() const override {
-        return items->GetLength();
+    void Set(const T& item, int index) override {
+        items->Set(index, item);
+    }
+
+    Cardinal GetLength() override {
+        return Cardinal(items->GetLength(), false);
     }
 
     Sequence<T>* GetSubsequence(int startIndex, int endIndex) override {
@@ -61,8 +65,8 @@ protected:
         return this;
     }
 
-    Sequence<T>* ConcatImpl(const Sequence<T>* list) {
-        for (int i = 0; i < list->GetLength(); i++) {
+    Sequence<T>* ConcatImpl(Sequence<T>* list) {
+        for (int i = 0; i < list->GetLength().GetValue(); i++) {
             items->Append(list->Get(i));
         }
         return this;
@@ -82,7 +86,7 @@ public:
         return Instance()->InsertAtImpl(item, index);
     }
 
-    Sequence<T>* Concat(const Sequence<T>* list) override {
+    Sequence<T>* Concat(Sequence<T>* list) override {
         return Instance()->ConcatImpl(list);
     }
 
@@ -94,7 +98,7 @@ public:
         Sequence<T>* result =
                 new MutableListSequence<T>(new LinkedList<T>());
 
-        for (int i = 0; i < this->GetLength(); i++) {
+        for (int i = 0; i < this->GetLength().GetValue(); i++) {
             result->Append(func(this->Get(i)));
         }
 
@@ -105,7 +109,7 @@ public:
         Sequence<T>* result =
                 new MutableListSequence<T>(new LinkedList<T>());
 
-        for (int i = 0; i < this->GetLength(); i++) {
+        for (int i = 0; i < this->GetLength().GetValue(); i++) {
             T value = this->Get(i);
 
             if (func(value)) {
@@ -119,7 +123,7 @@ public:
     T Reduce(T (*func)(const T&, const T&), const T& start) override {
         T result = start;
 
-        for (int i = 0; i < this->GetLength(); i++) {
+        for (int i = 0; i < this->GetLength().GetValue(); i++) {
             result = func(this->Get(i), result);
         }
 

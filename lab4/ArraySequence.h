@@ -23,24 +23,24 @@ public:
         items = arr;
     }
 
-    T GetFirst() const override {
+    T GetFirst() override {
         return items->Get(0);
     }
 
-    T GetLast() const override {
+    T GetLast() override {
         return items->Get(items->GetSize() - 1);
     }
 
-    T Get(int index) const override {
+    T Get(int index) override {
         return items->Get(index);
     }
 
-    int GetLength() const override {
-        return items->GetSize();
+    Cardinal GetLength() override {
+        return Cardinal(items->GetSize(), false);
     }
 
     Sequence<T>* GetSubsequence(int startIndex, int endIndex) override {
-        if (startIndex < 0 || endIndex >= GetLength() || startIndex > endIndex) {
+        if (startIndex < 0 || endIndex >= GetLength().GetValue() || startIndex > endIndex) {
             throw std::out_of_range("IndexOutOfRange");
         }
 
@@ -53,6 +53,14 @@ public:
         }
 
         return new MutableArraySequence<T>(newArr);
+    }
+
+    void Set(
+            const T& item,
+            int index
+    ) override{
+
+        items->Set(index, item);
     }
 
 protected:
@@ -95,9 +103,9 @@ protected:
         return this;
     }
 
-    Sequence<T>* ConcatImpl(const Sequence<T>* list) {
+    Sequence<T>* ConcatImpl(Sequence<T>* list) {
         int oldSize = items->GetSize();
-        int addSize = list->GetLength();
+        int addSize = list->GetLength().GetValue();
 
         items->Resize(oldSize + addSize);
 
@@ -122,7 +130,7 @@ public:
         return Instance()->InsertAtImpl(item, index);
     }
 
-    Sequence<T>* Concat(const Sequence<T>* list) override {
+    Sequence<T>* Concat(Sequence<T>* list) override {
         return Instance()->ConcatImpl(list);
     }
 
@@ -130,7 +138,7 @@ public:
         Sequence<T>* result =
                 new MutableArraySequence<T>(new DynamicArray<T>(0));
 
-        for (int i = 0; i < GetLength(); i++) {
+        for (int i = 0; i < GetLength().GetValue(); i++) {
             result->Append(func(Get(i)));
         }
 
@@ -141,7 +149,7 @@ public:
         Sequence<T>* result =
                 new MutableArraySequence<T>(new DynamicArray<T>(0));
 
-        for (int i = 0; i < GetLength(); i++) {
+        for (int i = 0; i < GetLength().GetValue(); i++) {
             T value = Get(i);
 
             if (func(value)) {
@@ -154,7 +162,7 @@ public:
     T Reduce(T (*func)(const T&, const T&), const T& start) override {
         T result = start;
 
-        for (int i = 0; i < GetLength(); i++) {
+        for (int i = 0; i < GetLength().GetValue(); i++) {
             result = func(Get(i), result);
         }
 

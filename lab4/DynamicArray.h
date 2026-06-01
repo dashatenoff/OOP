@@ -18,6 +18,7 @@ public:
     void Set(int index, const T& value);
     void Resize(int newSize);
     ~DynamicArray();
+
 };
 
 template<class T>

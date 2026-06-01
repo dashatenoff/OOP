@@ -28,6 +28,7 @@ public:
     LinkedList<T>* GetSubList(int startIndex, int endIndex) const;
 
     int GetLength() const;
+    void Set(int index, const T& item);
 
     void Append(const T& item);
     void Prepend(const T& item);
@@ -173,6 +174,18 @@ LinkedList<T>* LinkedList<T>::GetSubList(int startIndex, int endIndex) const{
 template<class T>
 int LinkedList<T>::GetLength() const{
     return size;
+}
+
+template<class T>
+void LinkedList<T>::Set(int index, const T& item){
+    if(index < 0 || index >= size){
+        throw std::out_of_range("IndexOutOfRange");
+    }
+    Node<T>* curr = head;
+    for(int i = 0; i < index; i++){
+        curr = curr->next;
+    }
+    curr->data = item;
 }
 
 template<class T>
